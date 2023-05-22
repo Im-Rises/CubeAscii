@@ -6,8 +6,4 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 project(CubeAscii)
 
-add_executable(CubeAscii main.c)
-
-if (UNIX)
-    target_link_libraries(CubeAscii m)
-endif(UNIX)
+add_subdirectory(${PROJECT_NAME})
