@@ -6,9 +6,7 @@
 #ifdef _WIN32
 #include <windows.h>
 #else
-
 #include <unistd.h>
-
 #endif
 
 #include "cUnicodeLib.h"
@@ -58,19 +56,21 @@ float calculateZ(int i, int j, int k) {
     return k * cos(rotationX) * cos(rotationY) - j * sin(rotationX) * cos(rotationY) + i * sin(rotationY);
 }
 
-void calculateForSurface(float cubeX, float cubeY, float cubeZ, int ch) {
+void calculateForSurface(float cubeX, float cubeY, float cubeZ, char ch) {
     x = calculateX(cubeX, cubeY, cubeZ);
     y = calculateY(cubeX, cubeY, cubeZ);
     z = calculateZ(cubeX, cubeY, cubeZ) + distanceFromCam;
 
     ooz = 1 / z;
 
-    xp = (int) (width / 2 + horizontalOffset + K1 * ooz * x * 2);
-    yp = (int) (height / 2 + K1 * ooz * y);
+    xp = (int)(width / 2 + horizontalOffset + K1 * ooz * x * 2);
+    yp = (int)(height / 2 + K1 * ooz * y);
 
     idx = xp + yp * width;
-    if (idx >= 0 && idx < width * height) {
-        if (ooz > zBuffer[idx]) {
+    if (idx >= 0 && idx < width * height)
+    {
+        if (ooz > zBuffer[idx])
+        {
             zBuffer[idx] = ooz;
             buffer[idx] = ch;
         }
@@ -87,30 +87,32 @@ void sleepMilliseconds(int milliseconds) {
 
 void printCube() {
     printf(ESC_CURSOR_HOME);
-    for (int k = 0; k < SCREEN_SIZE; k++) {
+    for (int k = 0; k < SCREEN_SIZE; k++)
+    {
 
-        switch (buffer[k]) {
-            case FACE_1_CHARACTER:
-                printf(ESC_FG_RED);
-                break;
-            case FACE_2_CHARACTER:
-                printf(ESC_FG_GREEN);
-                break;
-            case FACE_3_CHARACTER:
-                printf(ESC_FG_BLUE);
-                break;
-            case FACE_4_CHARACTER:
-                printf(ESC_FG_YELLOW);
-                break;
-            case FACE_5_CHARACTER:
-                printf(ESC_FG_MAGENTA);
-                break;
-            case FACE_6_CHARACTER:
-                printf(ESC_FG_CYAN);
-                break;
-            case '.':
-                printf(ESC_RESET_ALL);
-                break;
+        switch (buffer[k])
+        {
+        case FACE_1_CHARACTER:
+            printf(ESC_FG_RED);
+            break;
+        case FACE_2_CHARACTER:
+            printf(ESC_FG_GREEN);
+            break;
+        case FACE_3_CHARACTER:
+            printf(ESC_FG_BLUE);
+            break;
+        case FACE_4_CHARACTER:
+            printf(ESC_FG_YELLOW);
+            break;
+        case FACE_5_CHARACTER:
+            printf(ESC_FG_MAGENTA);
+            break;
+        case FACE_6_CHARACTER:
+            printf(ESC_FG_CYAN);
+            break;
+        case '.':
+            printf(ESC_RESET_ALL);
+            break;
         }
 
         putchar(k % width ? buffer[k] : '\n');
@@ -121,14 +123,17 @@ int main() {
     initUnicodeLib();
 
     printf(ESC_CLEAR_SCREEN);
-    while (1) {
-        memset(buffer, BACKGROUND_CHARACTER, (size_t) width * height);
-        memset(zBuffer, 0, (unsigned long) width * height * sizeof(float));
+    while (1)
+    {
+        memset(buffer, BACKGROUND_CHARACTER, (size_t)width * height);
+        memset(zBuffer, 0, (unsigned long)width * height * sizeof(float));
         cubeWidth = 20;
         horizontalOffset = -2 * cubeWidth;
 
-        for (float cubeX = -cubeWidth; cubeX < cubeWidth; cubeX += incrementSpeed) {
-            for (float cubeY = -cubeWidth; cubeY < cubeWidth; cubeY += incrementSpeed) {
+        for (float cubeX = -cubeWidth; cubeX < cubeWidth; cubeX += incrementSpeed)
+        {
+            for (float cubeY = -cubeWidth; cubeY < cubeWidth; cubeY += incrementSpeed)
+            {
                 calculateForSurface(cubeX, cubeY, -cubeWidth, FACE_1_CHARACTER);
                 calculateForSurface(cubeWidth, cubeY, cubeX, FACE_2_CHARACTER);
                 calculateForSurface(-cubeWidth, cubeY, -cubeX, FACE_3_CHARACTER);
@@ -139,9 +144,9 @@ int main() {
         }
         printCube();
 
-        rotationX += 0.05;
-        rotationY += 0.05;
-        rotationZ += 0.01;
+        rotationX += 0.05f;
+        rotationY += 0.05f;
+        rotationZ += 0.01f;
         sleepMilliseconds(16);
     }
     return 0;
