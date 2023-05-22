@@ -268,15 +268,15 @@ int main(int argc, char** argv) {
         screenWidth = 100;
         screenHeight = 30;
         cubeArray[0].horizontalOffset = 15;
-        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -30, 0, 100);
+        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, -0.05F, 0.06F, 20, -30, 0, 100);
     }
     else if (cubeCount == 3)
     {
         screenWidth = 120;
         screenHeight = 30;
         cubeArray[0].horizontalOffset = 5;
-        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -42, 0, 100);
-        cubeArray[2] = createCustomCube(0, 0, 0, 0.06F, 0.01F, 0.02F, 10, +45, 0, 100);
+        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, -0.05F, 0.06F, 20, -42, 0, 100);
+        cubeArray[2] = createCustomCube(0, 0, 0, 0.06F, 0.03F, 0.04F, 10, +45, 0, 100);
     }
     else
     {
