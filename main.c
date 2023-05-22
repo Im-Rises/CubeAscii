@@ -69,7 +69,7 @@ void calculateForSurface(float cubeX, float cubeY, float cubeZ, int ch) {
 int main() {
     initUnicodeLib();
 
-    printf("\x1b[2J");
+    printf(ESC_CLEAR_SCREEN);
     while (1) {
         memset(buffer, backgroundASCIICode, width * height);
         memset(zBuffer, 0, width * height * 4);
@@ -94,7 +94,7 @@ int main() {
 //                calculateForSurface(cubeX, cubeWidth, cubeY, ESC_FG_CYAN "#" ESC_RESET_ALL);
             }
         }
-        printf("\x1b[H");
+        printf(ESC_CURSOR_HOME);
         for (int k = 0; k < width * height; k++) {
             putchar(k % width ? buffer[k] : 10);
         }
