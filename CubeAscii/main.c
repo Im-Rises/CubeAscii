@@ -29,15 +29,16 @@ float rotationXSpeed = 0.05F;
 float rotationYSpeed = 0.05F;
 float rotationZSpeed = 0.01F;
 
-float cubeWidth = 20;
-int width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
-float zBuffer[SCREEN_SIZE];
-char buffer[SCREEN_SIZE];
+int screenWidth = SCREEN_WIDTH, screenHeight = SCREEN_HEIGHT;
+float cubeWidthHeight = 20;
 int distanceFromCam = 100;
 float horizontalOffset = 0;
 float K1 = 40;
-
 float incrementSpeed = 1.0F;
+
+float zBuffer[SCREEN_SIZE];
+char buffer[SCREEN_SIZE];
+
 
 float x, y, z;
 float ooz;
@@ -67,11 +68,11 @@ void calculateForSurface(float cubeX, float cubeY, float cubeZ, char ch) {
 
     ooz = 1 / z;
 
-    xp = (int)(width / 2 + horizontalOffset + K1 * ooz * x * 2);
-    yp = (int)(height / 2 + K1 * ooz * y);
+    xp = (int)(screenWidth / 2 + horizontalOffset + K1 * ooz * x * 2);
+    yp = (int)(screenHeight / 2 + K1 * ooz * y);
 
-    idx = xp + yp * width;
-    if (idx >= 0 && idx < width * height)
+    idx = xp + yp * screenWidth;
+    if (idx >= 0 && idx < screenWidth * screenHeight)
     {
         if (ooz > zBuffer[idx])
         {
@@ -118,7 +119,7 @@ void printCubeColored() {
             break;
         }
 
-        putchar(k % width ? buffer[k] : '\n');
+        putchar(k % screenWidth ? buffer[k] : '\n');
     }
 }
 
@@ -126,7 +127,7 @@ void printCube() {
     printf(ESC_CURSOR_HOME);
     for (int k = 0; k < SCREEN_SIZE; k++)
     {
-        putchar(k % width ? buffer[k] : '\n');
+        putchar(k % screenWidth ? buffer[k] : '\n');
     }
 }
 
@@ -136,20 +137,20 @@ int main() {
     printf(ESC_CLEAR_SCREEN);
     while (1)
     {
-        memset(buffer, BACKGROUND_CHARACTER, (size_t)width * height);
-        memset(zBuffer, 0, (unsigned long)width * height * sizeof(float));
-        cubeWidth = 20;
+        memset(buffer, BACKGROUND_CHARACTER, (size_t)screenWidth * screenHeight);
+        memset(zBuffer, 0, (unsigned long)screenWidth * screenHeight * sizeof(float));
+        cubeWidthHeight = 20;
 
-        for (float cubeX = -cubeWidth; cubeX < cubeWidth; cubeX += incrementSpeed)
+        for (float cubeX = -cubeWidthHeight; cubeX < cubeWidthHeight; cubeX += incrementSpeed)
         {
-            for (float cubeY = -cubeWidth; cubeY < cubeWidth; cubeY += incrementSpeed)
+            for (float cubeY = -cubeWidthHeight; cubeY < cubeWidthHeight; cubeY += incrementSpeed)
             {
-                calculateForSurface(cubeX, cubeY, -cubeWidth, FACE_1_CHARACTER);
-                calculateForSurface(cubeWidth, cubeY, cubeX, FACE_2_CHARACTER);
-                calculateForSurface(-cubeWidth, cubeY, -cubeX, FACE_3_CHARACTER);
-                calculateForSurface(-cubeX, cubeY, cubeWidth, FACE_4_CHARACTER);
-                calculateForSurface(cubeX, -cubeWidth, -cubeY, FACE_5_CHARACTER);
-                calculateForSurface(cubeX, cubeWidth, cubeY, FACE_6_CHARACTER);
+                calculateForSurface(cubeX, cubeY, -cubeWidthHeight, FACE_1_CHARACTER);
+                calculateForSurface(cubeWidthHeight, cubeY, cubeX, FACE_2_CHARACTER);
+                calculateForSurface(-cubeWidthHeight, cubeY, -cubeX, FACE_3_CHARACTER);
+                calculateForSurface(-cubeX, cubeY, cubeWidthHeight, FACE_4_CHARACTER);
+                calculateForSurface(cubeX, -cubeWidthHeight, -cubeY, FACE_5_CHARACTER);
+                calculateForSurface(cubeX, cubeWidthHeight, cubeY, FACE_6_CHARACTER);
             }
         }
         printCubeColored();
