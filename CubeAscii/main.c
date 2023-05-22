@@ -23,27 +23,23 @@
 #define FACE_5_CHARACTER ';'
 #define FACE_6_CHARACTER '+'
 
+int screenWidth = SCREEN_WIDTH, screenHeight = SCREEN_HEIGHT;
+
+float zBuffer[SCREEN_SIZE];
+char buffer[SCREEN_SIZE];
+
 float rotationX, rotationY, rotationZ;
 
 float rotationXSpeed = 0.05F;
 float rotationYSpeed = 0.05F;
 float rotationZSpeed = 0.01F;
 
-int screenWidth = SCREEN_WIDTH, screenHeight = SCREEN_HEIGHT;
 float cubeWidthHeight = 20;
 int distanceFromCam = 100;
 float horizontalOffset = 0;
+float verticalOffset = 0;
 float K1 = 40;
-float incrementSpeed = 1.0F;
-
-float zBuffer[SCREEN_SIZE];
-char buffer[SCREEN_SIZE];
-
-
-float x, y, z;
-float ooz;
-int xp, yp;
-int idx;
+float charIncrementSpeed = 1.0F;
 
 float calculateX(int i, int j, int k) {
     return j * sin(rotationX) * sin(rotationY) * cos(rotationZ) - k * cos(rotationX) * sin(rotationY) * cos(rotationZ) +
@@ -62,16 +58,16 @@ float calculateZ(int i, int j, int k) {
 }
 
 void calculateForSurface(float cubeX, float cubeY, float cubeZ, char ch) {
-    x = calculateX(cubeX, cubeY, cubeZ);
-    y = calculateY(cubeX, cubeY, cubeZ);
-    z = calculateZ(cubeX, cubeY, cubeZ) + distanceFromCam;
+    float x = calculateX(cubeX, cubeY, cubeZ);
+    float y = calculateY(cubeX, cubeY, cubeZ);
+    float z = calculateZ(cubeX, cubeY, cubeZ) + distanceFromCam;
 
-    ooz = 1 / z;
+    float ooz = 1 / z;
 
-    xp = (int)(screenWidth / 2 + horizontalOffset + K1 * ooz * x * 2);
-    yp = (int)(screenHeight / 2 + K1 * ooz * y);
+    int xp = (int)(screenWidth / 2 + horizontalOffset + K1 * ooz * x * 2);
+    int yp = (int)(screenHeight / 2 + verticalOffset + K1 * ooz * y);
 
-    idx = xp + yp * screenWidth;
+    int idx = xp + yp * screenWidth;
     if (idx >= 0 && idx < screenWidth * screenHeight)
     {
         if (ooz > zBuffer[idx])
@@ -131,19 +127,27 @@ void printCube() {
     }
 }
 
-int main() {
+int main(int argc, char** argv) {
     initUnicodeLib();
+
+    //    if (argc > 1)
+    //    {
+    //        switch (argv[1][0])
+    //        {
+    //        case 'c':
+    //            break;
+    //        }
+    //    }
 
     printf(ESC_CLEAR_SCREEN);
     while (1)
     {
         memset(buffer, BACKGROUND_CHARACTER, (size_t)screenWidth * screenHeight);
         memset(zBuffer, 0, (unsigned long)screenWidth * screenHeight * sizeof(float));
-        cubeWidthHeight = 20;
 
-        for (float cubeX = -cubeWidthHeight; cubeX < cubeWidthHeight; cubeX += incrementSpeed)
+        for (float cubeX = -cubeWidthHeight; cubeX < cubeWidthHeight; cubeX += charIncrementSpeed)
         {
-            for (float cubeY = -cubeWidthHeight; cubeY < cubeWidthHeight; cubeY += incrementSpeed)
+            for (float cubeY = -cubeWidthHeight; cubeY < cubeWidthHeight; cubeY += charIncrementSpeed)
             {
                 calculateForSurface(cubeX, cubeY, -cubeWidthHeight, FACE_1_CHARACTER);
                 calculateForSurface(cubeWidthHeight, cubeY, cubeX, FACE_2_CHARACTER);
@@ -161,5 +165,6 @@ int main() {
         rotationZ += rotationZSpeed;
         sleepMilliseconds(16);
     }
+
     return 0;
 }
