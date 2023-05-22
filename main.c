@@ -12,7 +12,7 @@
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 44
-#define SCREEN_SIZE SCREEN_WIDTH * SCREEN_HEIGHT
+#define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)
 
 float A, B, C;
 
@@ -66,47 +66,47 @@ void calculateForSurface(float cubeX, float cubeY, float cubeZ, int ch) {
     }
 }
 
+void sleepMilliseconds(int milliseconds) {
+#ifdef _WIN32
+    Sleep(milliseconds);
+#else
+    usleep(milliseconds * 1000);
+#endif
+}
+
+void printBuffer() {
+    printf(ESC_CURSOR_HOME);
+    for (int k = 0; k < width * height; k++) {
+        putchar(k % width ? buffer[k] : '\n');
+    }
+}
+
 int main() {
     initUnicodeLib();
 
     printf(ESC_CLEAR_SCREEN);
     while (1) {
         memset(buffer, backgroundASCIICode, width * height);
-        memset(zBuffer, 0, width * height * 4);
+        memset(zBuffer, 0, width * height * sizeof(float));
         cubeWidth = 20;
         horizontalOffset = -2 * cubeWidth;
         // first cube
         for (float cubeX = -cubeWidth; cubeX < cubeWidth; cubeX += incrementSpeed) {
-            for (float cubeY = -cubeWidth; cubeY < cubeWidth;
-                 cubeY += incrementSpeed) {
+            for (float cubeY = -cubeWidth; cubeY < cubeWidth; cubeY += incrementSpeed) {
                 calculateForSurface(cubeX, cubeY, -cubeWidth, '@');
                 calculateForSurface(cubeWidth, cubeY, cubeX, '$');
                 calculateForSurface(-cubeWidth, cubeY, -cubeX, '~');
                 calculateForSurface(-cubeX, cubeY, cubeWidth, '#');
                 calculateForSurface(cubeX, -cubeWidth, -cubeY, ';');
                 calculateForSurface(cubeX, cubeWidth, cubeY, '+');
-
-//                calculateForSurface(cubeX, cubeY, -cubeWidth, ESC_FG_RED "@" ESC_RESET_ALL);
-//                calculateForSurface(cubeWidth, cubeY, cubeX, ESC_FG_GREEN "#" ESC_RESET_ALL);
-//                calculateForSurface(-cubeWidth, cubeY, -cubeX, ESC_FG_BLUE "~" ESC_RESET_ALL);
-//                calculateForSurface(-cubeX, cubeY, cubeWidth, ESC_FG_YELLOW "#" ESC_RESET_ALL);
-//                calculateForSurface(cubeX, -cubeWidth, -cubeY, ESC_FG_MAGENTA ";" ESC_RESET_ALL);
-//                calculateForSurface(cubeX, cubeWidth, cubeY, ESC_FG_CYAN "#" ESC_RESET_ALL);
             }
         }
-        printf(ESC_CURSOR_HOME);
-        for (int k = 0; k < width * height; k++) {
-            putchar(k % width ? buffer[k] : 10);
-        }
+        printBuffer();
 
         A += 0.05;
         B += 0.05;
         C += 0.01;
-#ifdef _WIN32
-        Sleep(16);
-#else
-        usleep(8000 * 2);
-#endif
+        sleepMilliseconds(16);
     }
     return 0;
 }
