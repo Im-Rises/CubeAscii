@@ -17,9 +17,6 @@
 #define OPTION_CUBE_GRAY_MODE "-g"
 #define OPTION_HELP "-h"
 
-#define SCREEN_WIDTH 60
-#define SCREEN_HEIGHT 30
-#define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)
 #define FRAME_DELAY_MILLISECONDS 16
 
 #define MAX_CUBE_COUNT 3
@@ -32,10 +29,10 @@
 #define FACE_5_CHARACTER ';'
 #define FACE_6_CHARACTER '+'
 
-int screenWidth = SCREEN_WIDTH, screenHeight = SCREEN_HEIGHT;
+int screenWidth, screenHeight, screenSize;
 
-float zBuffer[SCREEN_SIZE];
-char buffer[SCREEN_SIZE];
+float* zBuffer;
+char* buffer;
 
 float K1 = 40;
 
@@ -148,7 +145,7 @@ void sleepMilliseconds(int milliseconds) {
 
 void printToConsoleColored() {
     printf(ESC_CURSOR_HOME);
-    for (int k = 0; k < SCREEN_SIZE; k++)
+    for (int k = 0; k < screenSize; k++)
     {
         switch (buffer[k])
         {
@@ -181,7 +178,7 @@ void printToConsoleColored() {
 
 void printToConsole() {
     printf(ESC_CURSOR_HOME);
-    for (int k = 0; k < SCREEN_SIZE; k++)
+    for (int k = 0; k < screenSize; k++)
     {
         putchar(k % screenWidth ? buffer[k] : '\n');
     }
@@ -271,12 +268,21 @@ int main(int argc, char** argv) {
     printf(ESC_CLEAR_SCREEN);
 
     /* Initialize cube */
-    Cube cube = createCube();
-    //    Cube cubeArray[MAX_CUBE_COUNT];
-    //    for (int i = 0; i < cubeCount; i++)
-    //    {
-    //        cubeArray[i] = createCube();
-    //    }
+    Cube cubeArray[MAX_CUBE_COUNT];
+    for (int i = 0; i < cubeCount; i++)
+    {
+        cubeArray[i] = createCube();
+    }
+
+    if (cubeCount == 1)
+    {
+        screenWidth = 60;
+        screenHeight = 30;
+    }
+
+    screenSize = screenWidth * screenHeight;
+    buffer = malloc(screenSize * sizeof(char));
+    zBuffer = malloc(screenSize * sizeof(float));
 
     /* Main loop */
     while (1)
@@ -286,13 +292,19 @@ int main(int argc, char** argv) {
         memset(zBuffer, 0, (unsigned long)screenWidth * screenHeight * sizeof(float));
 
         /* Update buffers */
-        updateBuffers(&cube);
+        for (int i = 0; i < cubeCount; i++)
+        {
+            updateBuffers(&cubeArray[i]);
+        }
 
         /* Display buffers to console */
         printCubePtr();
 
         /* Rotate cube */
-        rotateCube(&cube);
+        for (int i = 0; i < cubeCount; i++)
+        {
+            rotateCube(&cubeArray[i]);
+        }
 
         /* Delay */
         sleepMilliseconds(FRAME_DELAY_MILLISECONDS);
