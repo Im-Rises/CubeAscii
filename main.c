@@ -14,7 +14,7 @@
 #define SCREEN_HEIGHT 44
 #define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)
 
-float A, B, C;
+float rotationX, rotationY, rotationZ;
 
 float cubeWidth = 20;
 int width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
@@ -33,18 +33,18 @@ int xp, yp;
 int idx;
 
 float calculateX(int i, int j, int k) {
-    return j * sin(A) * sin(B) * cos(C) - k * cos(A) * sin(B) * cos(C) +
-           j * cos(A) * sin(C) + k * sin(A) * sin(C) + i * cos(B) * cos(C);
+    return j * sin(rotationX) * sin(rotationY) * cos(rotationZ) - k * cos(rotationX) * sin(rotationY) * cos(rotationZ) +
+           j * cos(rotationX) * sin(rotationZ) + k * sin(rotationX) * sin(rotationZ) + i * cos(rotationY) * cos(rotationZ);
 }
 
 float calculateY(int i, int j, int k) {
-    return j * cos(A) * cos(C) + k * sin(A) * cos(C) -
-           j * sin(A) * sin(B) * sin(C) + k * cos(A) * sin(B) * sin(C) -
-           i * cos(B) * sin(C);
+    return j * cos(rotationX) * cos(rotationZ) + k * sin(rotationX) * cos(rotationZ) -
+           j * sin(rotationX) * sin(rotationY) * sin(rotationZ) + k * cos(rotationX) * sin(rotationY) * sin(rotationZ) -
+           i * cos(rotationY) * sin(rotationZ);
 }
 
 float calculateZ(int i, int j, int k) {
-    return k * cos(A) * cos(B) - j * sin(A) * cos(B) + i * sin(B);
+    return k * cos(rotationX) * cos(rotationY) - j * sin(rotationX) * cos(rotationY) + i * sin(rotationY);
 }
 
 void calculateForSurface(float cubeX, float cubeY, float cubeZ, int ch) {
@@ -76,7 +76,7 @@ void sleepMilliseconds(int milliseconds) {
 
 void printBuffer() {
     printf(ESC_CURSOR_HOME);
-    for (int k = 0; k < width * height; k++) {
+    for (int k = 0; k < SCREEN_SIZE; k++) {
         putchar(k % width ? buffer[k] : '\n');
     }
 }
@@ -103,9 +103,9 @@ int main() {
         }
         printBuffer();
 
-        A += 0.05;
-        B += 0.05;
-        C += 0.01;
+        rotationX += 0.05;
+        rotationY += 0.05;
+        rotationZ += 0.01;
         sleepMilliseconds(16);
     }
     return 0;
