@@ -1,4 +1,5 @@
 #include <math.h>
+#include <stddef.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -121,8 +122,8 @@ int main() {
 
     printf(ESC_CLEAR_SCREEN);
     while (1) {
-        memset(buffer, BACKGROUND_CHARACTER, width * height);
-        memset(zBuffer, 0, width * height * sizeof(float));
+        memset(buffer, BACKGROUND_CHARACTER, (size_t) width * height);
+        memset(zBuffer, 0, (unsigned long) width * height * sizeof(float));
         cubeWidth = 20;
         horizontalOffset = -2 * cubeWidth;
 
