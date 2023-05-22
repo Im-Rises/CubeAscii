@@ -9,6 +9,8 @@
 #include <unistd.h>
 #endif
 
+#include <stdlib.h>
+
 #include "cUnicodeLib.h"
 
 #define OPTION_CUBE_COUNT "-c"
@@ -19,6 +21,8 @@
 #define SCREEN_HEIGHT 30
 #define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)
 #define FRAME_DELAY_MILLISECONDS 16
+
+#define MAX_CUBE_COUNT 3
 
 #define BACKGROUND_CHARACTER '.'
 #define FACE_1_CHARACTER '@'
@@ -211,7 +215,17 @@ int main(int argc, char** argv) {
             {
                 if (i + 1 < argc)
                 {
-                    cubeCount = 2;
+                    cubeCount = atoi(argv[i + 1]);
+                    if (cubeCount < 1)
+                    {
+                        fprintf(stderr, "Cube count must be greater than 0\n");
+                        return 1;
+                    }
+                    else if (cubeCount > MAX_CUBE_COUNT)
+                    {
+                        fprintf(stderr, "Cube count must be less than %d\n", MAX_CUBE_COUNT);
+                        return 1;
+                    }
                     i++;
                 }
                 else
