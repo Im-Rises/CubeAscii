@@ -25,6 +25,10 @@
 
 float rotationX, rotationY, rotationZ;
 
+float rotationXSpeed = 0.05F;
+float rotationYSpeed = 0.05F;
+float rotationZSpeed = 0.01F;
+
 float cubeWidth = 20;
 int width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
 float zBuffer[SCREEN_SIZE];
@@ -33,7 +37,7 @@ int distanceFromCam = 100;
 float horizontalOffset = 0;
 float K1 = 40;
 
-float incrementSpeed = 0.6;
+float incrementSpeed = 1.0F;
 
 float x, y, z;
 float ooz;
@@ -151,9 +155,9 @@ int main() {
         printCubeColored();
         //        printCube();
 
-        rotationX += 0.05F;
-        rotationY += 0.05F;
-        rotationZ += 0.01F;
+        rotationX += rotationXSpeed;
+        rotationY += rotationYSpeed;
+        rotationZ += rotationZSpeed;
         sleepMilliseconds(16);
     }
     return 0;
