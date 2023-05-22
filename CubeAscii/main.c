@@ -276,7 +276,7 @@ int main(int argc, char** argv) {
         screenHeight = 30;
         cubeArray[0].horizontalOffset = 5;
         cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -42, 0, 100);
-        cubeArray[2] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 10, +45, 0, 100);
+        cubeArray[2] = createCustomCube(0, 0, 0, 0.06F, 0.01F, 0.02F, 10, +45, 0, 100);
     }
     else
     {
