@@ -5,7 +5,9 @@
 #ifdef _WIN32
 #include <windows.h>
 #else
+
 #include <unistd.h>
+
 #endif
 
 #include "cUnicodeLib.h"
@@ -34,7 +36,8 @@ int idx;
 
 float calculateX(int i, int j, int k) {
     return j * sin(rotationX) * sin(rotationY) * cos(rotationZ) - k * cos(rotationX) * sin(rotationY) * cos(rotationZ) +
-           j * cos(rotationX) * sin(rotationZ) + k * sin(rotationX) * sin(rotationZ) + i * cos(rotationY) * cos(rotationZ);
+           j * cos(rotationX) * sin(rotationZ) + k * sin(rotationX) * sin(rotationZ) +
+           i * cos(rotationY) * cos(rotationZ);
 }
 
 float calculateY(int i, int j, int k) {
@@ -54,8 +57,8 @@ void calculateForSurface(float cubeX, float cubeY, float cubeZ, int ch) {
 
     ooz = 1 / z;
 
-    xp = (int)(width / 2 + horizontalOffset + K1 * ooz * x * 2);
-    yp = (int)(height / 2 + K1 * ooz * y);
+    xp = (int) (width / 2 + horizontalOffset + K1 * ooz * x * 2);
+    yp = (int) (height / 2 + K1 * ooz * y);
 
     idx = xp + yp * width;
     if (idx >= 0 && idx < width * height) {
@@ -77,6 +80,31 @@ void sleepMilliseconds(int milliseconds) {
 void printBuffer() {
     printf(ESC_CURSOR_HOME);
     for (int k = 0; k < SCREEN_SIZE; k++) {
+
+        switch (buffer[k]) {
+            case '@':
+                printf(ESC_FG_RED);
+                break;
+            case '$':
+                printf(ESC_FG_GREEN);
+                break;
+            case '~':
+                printf(ESC_FG_BLUE);
+                break;
+            case '#':
+                printf(ESC_FG_YELLOW);
+                break;
+            case ';':
+                printf(ESC_FG_MAGENTA);
+                break;
+            case '+':
+                printf(ESC_FG_CYAN);
+                break;
+            case '.':
+                printf(ESC_RESET_ALL);
+                break;
+        }
+
         putchar(k % width ? buffer[k] : '\n');
     }
 }
