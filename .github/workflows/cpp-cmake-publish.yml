@@ -29,9 +29,6 @@ jobs:
           name: artifact-windows
           path: |
             ./CubeAscii.exe
-            ./imgui.ini
-            ./shaders/CubeAscii.vert
-            ./shaders/CubeAscii.frag
   build-ubuntu:
     name: Build ubuntu
     runs-on: ubuntu-latest
@@ -52,9 +49,6 @@ jobs:
           name: artifact-ubuntu
           path: |
             ./CubeAsciiLauncher
-            ./imgui.ini
-            ./shaders/CubeAscii.vert
-            ./shaders/CubeAscii.frag
   build-macos:
     name: Build macos
     runs-on: macos-latest
@@ -74,9 +68,6 @@ jobs:
           name: artifact-macos
           path: |
             ./CubeAsciiLauncher
-            ./imgui.ini
-            ./shaders/CubeAscii.vert
-            ./shaders/CubeAscii.frag
   release-project:
     name: Release project
     runs-on: ubuntu-latest
