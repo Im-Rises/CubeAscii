@@ -184,11 +184,13 @@ void printToConsole() {
 }
 
 void printUsage(const char* programName) {
-    printf("Usage: %s [OPTIONS]\n", programName);
-    printf("Options:\n");
-    printf("  -c <count>    Number of cubes to render (default: 1)\n");
-    printf("  -g            Render in gray mode\n");
-    printf("  -h            Print this help message\n");
+    printf("Usage: %s [OPTIONS]\n"
+           "Options:\n"
+           "  %s <count>    Number of cubes to render (default: 1)\n"
+           "  %s            Render in gray mode\n"
+           "  %s            Print this help message\n"
+           "\n",
+        programName, OPTION_CUBE_COUNT, OPTION_CUBE_GRAY_MODE, OPTION_HELP);
 }
 
 void printUnknownArgumentError(const char* argument) {
