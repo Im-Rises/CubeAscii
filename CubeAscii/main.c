@@ -14,6 +14,7 @@
 #define SCREEN_WIDTH 60
 #define SCREEN_HEIGHT 30
 #define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)
+#define FRAME_DELAY_MILLISECONDS 16
 
 #define BACKGROUND_CHARACTER '.'
 #define FACE_1_CHARACTER '@'
@@ -56,19 +57,20 @@ Cube createCube() {
     return cube;
 }
 
-// Cube createCube(float rotationX, float rotationY, float rotationZ, float rotationXSpeed, float rotationYSpeed, float rotationZSpeed, float cubeWidthHeight, float horizontalOffset, float verticalOffset) {
-//     Cube cube;
-//     cube.rotationX = rotationX;
-//     cube.rotationY = rotationY;
-//     cube.rotationZ = rotationZ;
-//     cube.rotationXSpeed = rotationXSpeed;
-//     cube.rotationYSpeed = rotationYSpeed;
-//     cube.rotationZSpeed = rotationZSpeed;
-//     cube.cubeWidthHeight = cubeWidthHeight;
-//     cube.horizontalOffset = horizontalOffset;
-//     cube.verticalOffset = verticalOffset;
-//     return cube;
-// }
+Cube createCustomCube(float rotationX, float rotationY, float rotationZ, float rotationXSpeed, float rotationYSpeed, float rotationZSpeed, float cubeWidthHeight, float horizontalOffset, float verticalOffset, int distanceFromCam) {
+    Cube cube;
+    cube.rotationX = rotationX;
+    cube.rotationY = rotationY;
+    cube.rotationZ = rotationZ;
+    cube.rotationXSpeed = rotationXSpeed;
+    cube.rotationYSpeed = rotationYSpeed;
+    cube.rotationZSpeed = rotationZSpeed;
+    cube.cubeWidthHeight = cubeWidthHeight;
+    cube.horizontalOffset = horizontalOffset;
+    cube.verticalOffset = verticalOffset;
+    cube.distanceFromCam = distanceFromCam;
+    return cube;
+}
 
 float calculateX(int i, int j, int k, Cube* cube) {
     return j * sin(cube->rotationX) * sin(cube->rotationY) * cos(cube->rotationZ) - k * cos(cube->rotationX) * sin(cube->rotationY) * cos(cube->rotationZ) +
@@ -205,7 +207,7 @@ int main() {
         rotateCube(&cube);
 
         /* Delay */
-        sleepMilliseconds(16);
+        sleepMilliseconds(FRAME_DELAY_MILLISECONDS);
     }
 
     return 0;
