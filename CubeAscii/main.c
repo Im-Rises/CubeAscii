@@ -11,6 +11,10 @@
 
 #include "cUnicodeLib.h"
 
+#define OPTION_CUBE_COUNT "-c"
+#define OPTION_CUBE_GRAY_MODE "-g"
+#define OPTION_HELP "-h"
+
 #define SCREEN_WIDTH 60
 #define SCREEN_HEIGHT 30
 #define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)
@@ -138,7 +142,7 @@ void sleepMilliseconds(int milliseconds) {
 #endif
 }
 
-void printToConsole() {
+void printToConsoleColored() {
     printf(ESC_CURSOR_HOME);
     for (int k = 0; k < SCREEN_SIZE; k++)
     {
@@ -171,7 +175,7 @@ void printToConsole() {
     }
 }
 
-void printCube() {
+void printToConsole() {
     printf(ESC_CURSOR_HOME);
     for (int k = 0; k < SCREEN_SIZE; k++)
     {
@@ -179,26 +183,68 @@ void printCube() {
     }
 }
 
-int main(int argc, char** argv) {
-    int grayMode = 0;
-    int cubeCount = 1;
-    if (argc > 1)
-    {
-        if (strcmp(argv[1], "grayMode") == 0)
-        {
-            grayMode = 1;
-        }
-    }
+void printUsage(const char* programName) {
+    printf("Usage: %s [OPTIONS]\n", programName);
+    printf("Options:\n");
+    printf("  -c <count>    Number of cubes to render (default: 1)\n");
+    printf("  -g            Render in gray mode\n");
+    printf("  -h            Print this help message\n");
+}
 
-    if (argc > 2)
+void printUnknownArgumentError(const char* argument) {
+    fprintf(stderr, "Unknown argument: %s\n", argument);
+}
+
+int main(int argc, char** argv) {
+    void (*printCubePtr)() = printToConsoleColored;
+    int cubeCount = 1;
+
+    /* Handle arguments */
+    for (int i = 1; i < argc; i++)
     {
-        if (strcmp(argv[2], "2") == 0)
+        switch (argv[i][0])
         {
-            cubeCount = 2;
-        }
-        else if (strcmp(argv[2], "3") == 0)
-        {
-            cubeCount = 3;
+        case '-':
+            if (strcmp(argv[i], OPTION_CUBE_COUNT) == 0)
+            {
+                if (i + 1 < argc)
+                {
+                    cubeCount = 2;
+                    i++;
+                }
+                else
+                {
+                    printUsage(argv[0]);
+                    return 1;
+                }
+            }
+            else if (strcmp(argv[i], OPTION_CUBE_GRAY_MODE) == 0)
+            {
+                if (i + 1 < argc)
+                {
+                    printCubePtr = printToConsole;
+                    i++;
+                }
+                else
+                {
+                    printUsage(argv[0]);
+                    return 1;
+                }
+            }
+            else if (strcmp(argv[i], OPTION_HELP) == 0)
+            {
+                printUsage(argv[0]);
+                return 0;
+            }
+            else
+            {
+                printUnknownArgumentError(argv[i]);
+                return 1;
+            }
+            break;
+        default:
+            printUsage(argv[0]);
+            return 1;
         }
     }
 
@@ -221,10 +267,7 @@ int main(int argc, char** argv) {
         updateBuffers(&cube);
 
         /* Display buffers to console */
-        if (grayMode)
-            printCube();
-        else
-            printToConsole();
+        printCubePtr();
 
         /* Rotate cube */
         rotateCube(&cube);
