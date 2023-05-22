@@ -10,6 +10,7 @@
 #endif
 
 #include <stdlib.h>
+#include <time.h>
 
 #include "cUnicodeLib.h"
 
@@ -20,6 +21,9 @@
 #define FRAME_DELAY_MILLISECONDS 16
 
 #define MAX_CUBE_COUNT 3
+
+#define MIN_ROTATION_SPEED -0.1F
+#define MAX_ROTATION_SPEED 0.1F
 
 #define BACKGROUND_CHARACTER '.'
 #define FACE_1_CHARACTER '@'
@@ -50,9 +54,9 @@ Cube createCube() {
     cube.rotationX = 0;
     cube.rotationY = 0;
     cube.rotationZ = 0;
-    cube.rotationXSpeed = 0.05F;
-    cube.rotationYSpeed = 0.04F;
-    cube.rotationZSpeed = 0.01F;
+    cube.rotationXSpeed = 0.00F;
+    cube.rotationYSpeed = 0.00F;
+    cube.rotationZSpeed = 0.00F;
     cube.cubeWidthHeight = 40;
     cube.horizontalOffset = 0;
     cube.verticalOffset = 0;
@@ -189,6 +193,15 @@ void printToConsole() {
     }
 }
 
+float randomFloat(float min, float max) {
+    float scale = rand() / (float)RAND_MAX;
+    return min + scale * (max - min);
+}
+
+float randomRotationValue() {
+    return randomFloat(MIN_ROTATION_SPEED, MAX_ROTATION_SPEED);
+}
+
 void printUsage(const char* programName) {
     printf("Usage: %s [OPTIONS]\n"
            "Options:\n"
@@ -207,6 +220,10 @@ void printUnknownArgumentError(const char* argument) {
 }
 
 int main(int argc, char** argv) {
+    /* Initialize the random number generator */
+    srand(time(NULL));
+
+    /* Argument variables */
     void (*printCubePtr)() = printToConsoleColored;
     int cubeCount = 1;
 
@@ -262,6 +279,9 @@ int main(int argc, char** argv) {
     /* Initialize cube */
     Cube cubeArray[MAX_CUBE_COUNT];
     cubeArray[0] = createCube();
+    cubeArray[0].rotationXSpeed = randomRotationValue();
+    cubeArray[0].rotationYSpeed = randomRotationValue();
+    cubeArray[0].rotationZSpeed = randomRotationValue();
 
     if (cubeCount == 1)
     {
@@ -273,15 +293,15 @@ int main(int argc, char** argv) {
         screenWidth = 100;
         screenHeight = 30;
         cubeArray[0].horizontalOffset = 15;
-        cubeArray[1] = createCustomCube(0, 0, 0, 0.04F, 0.05F, -0.02F, 20, -30, 0, 100);
+        cubeArray[1] = createCustomCube(0, 0, 0, randomRotationValue(), randomRotationValue(), randomRotationValue(), 20, -30, 0, 100);
     }
     else if (cubeCount == 3)
     {
         screenWidth = 120;
         screenHeight = 30;
         cubeArray[0].horizontalOffset = 5;
-        cubeArray[1] = createCustomCube(0, 0, 0, 0.04F, 0.05F, -0.02F, 20, -42, 0, 100);
-        cubeArray[2] = createCustomCube(0, 0, 0, 0.01F, -0.05F, 0.04F, 10, +45, 0, 100);
+        cubeArray[1] = createCustomCube(0, 0, 0, randomRotationValue(), randomRotationValue(), randomRotationValue(), 20, -42, 0, 100);
+        cubeArray[2] = createCustomCube(0, 0, 0, randomRotationValue(), randomRotationValue(), randomRotationValue(), 10, +45, 0, 100);
     }
     else
     {
