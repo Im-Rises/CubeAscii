@@ -28,7 +28,6 @@ int screenWidth = SCREEN_WIDTH, screenHeight = SCREEN_HEIGHT;
 float zBuffer[SCREEN_SIZE];
 char buffer[SCREEN_SIZE];
 
-int distanceFromCam = 100;
 float K1 = 40;
 float charIncrementSpeed = 1.0F;
 
@@ -39,6 +38,7 @@ struct Cube {
     float rotationXSpeed, rotationYSpeed, rotationZSpeed;
     float cubeWidthHeight;
     float horizontalOffset, verticalOffset;
+    int distanceFromCam;
 };
 
 Cube createCube() {
@@ -52,6 +52,7 @@ Cube createCube() {
     cube.cubeWidthHeight = 40;
     cube.horizontalOffset = 0;
     cube.verticalOffset = 0;
+    cube.distanceFromCam = 100;
     return cube;
 }
 
@@ -88,7 +89,7 @@ float calculateZ(int i, int j, int k, Cube* cube) {
 void calculateForSurface(float cubeX, float cubeY, float cubeZ, Cube* cube, char ch) {
     float x = calculateX(cubeX, cubeY, cubeZ, cube);
     float y = calculateY(cubeX, cubeY, cubeZ, cube);
-    float z = calculateZ(cubeX, cubeY, cubeZ, cube) + distanceFromCam;
+    float z = calculateZ(cubeX, cubeY, cubeZ, cube) + cube->distanceFromCam;
 
     float ooz = 1 / z;
 
