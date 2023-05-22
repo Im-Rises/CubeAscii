@@ -8,7 +8,7 @@
 #include <unistd.h>
 #endif
 
-//#include "cUnicodeLib.h"
+#include "cUnicodeLib.h"
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 44
@@ -67,6 +67,8 @@ void calculateForSurface(float cubeX, float cubeY, float cubeZ, int ch) {
 }
 
 int main() {
+    initUnicodeLib();
+
     printf("\x1b[2J");
     while (1) {
         memset(buffer, backgroundASCIICode, width * height);
@@ -83,6 +85,13 @@ int main() {
                 calculateForSurface(-cubeX, cubeY, cubeWidth, '#');
                 calculateForSurface(cubeX, -cubeWidth, -cubeY, ';');
                 calculateForSurface(cubeX, cubeWidth, cubeY, '+');
+
+//                calculateForSurface(cubeX, cubeY, -cubeWidth, ESC_FG_RED "@" ESC_RESET_ALL);
+//                calculateForSurface(cubeWidth, cubeY, cubeX, ESC_FG_GREEN "#" ESC_RESET_ALL);
+//                calculateForSurface(-cubeWidth, cubeY, -cubeX, ESC_FG_BLUE "~" ESC_RESET_ALL);
+//                calculateForSurface(-cubeX, cubeY, cubeWidth, ESC_FG_YELLOW "#" ESC_RESET_ALL);
+//                calculateForSurface(cubeX, -cubeWidth, -cubeY, ESC_FG_MAGENTA ";" ESC_RESET_ALL);
+//                calculateForSurface(cubeX, cubeWidth, cubeY, ESC_FG_CYAN "#" ESC_RESET_ALL);
             }
         }
         printf("\x1b[H");
