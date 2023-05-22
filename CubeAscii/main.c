@@ -144,9 +144,9 @@ int main() {
         }
         printCube();
 
-        rotationX += 0.05f;
-        rotationY += 0.05f;
-        rotationZ += 0.01f;
+        rotationX += 0.05F;
+        rotationY += 0.05F;
+        rotationZ += 0.01F;
         sleepMilliseconds(16);
     }
     return 0;
