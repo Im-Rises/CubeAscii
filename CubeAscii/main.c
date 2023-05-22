@@ -45,6 +45,7 @@ int distanceFromCam = 100;
 float horizontalOffset = 0;
 float verticalOffset = 0;
 float K1 = 40;
+
 float charIncrementSpeed = 1.0F;
 
 float calculateX(int i, int j, int k) {
@@ -157,8 +158,10 @@ void printCube() {
 }
 
 int main(int argc, char** argv) {
+    /* Initialize unicode library */
     initUnicodeLib();
 
+    /* Clear screen */
     printf(ESC_CLEAR_SCREEN);
 
     while (1)
@@ -171,7 +174,7 @@ int main(int argc, char** argv) {
         updateBuffers();
 
         /* Display buffers to console */
-        printToConsole(); //        printCube();
+        printToConsole(); // printCube();
 
         /* Rotate cube */
         rotateCube();
