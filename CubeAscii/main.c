@@ -30,8 +30,6 @@ float zBuffer[SCREEN_SIZE];
 char buffer[SCREEN_SIZE];
 
 float K1 = 40;
-float charIncrementSpeed = 1.0F;
-
 
 typedef struct Cube Cube;
 struct Cube {
@@ -88,7 +86,7 @@ float calculateZ(int i, int j, int k, Cube* cube) {
     return k * cos(cube->rotationX) * cos(cube->rotationY) - j * sin(cube->rotationX) * cos(cube->rotationY) + i * sin(cube->rotationY);
 }
 
-void calculateForSurface(float cubeX, float cubeY, float cubeZ, Cube* cube, char ch) {
+void calculateForSurface(int cubeX, int cubeY, int cubeZ, Cube* cube, char ch) {
     float x = calculateX(cubeX, cubeY, cubeZ, cube);
     float y = calculateY(cubeX, cubeY, cubeZ, cube);
     float z = calculateZ(cubeX, cubeY, cubeZ, cube) + cube->distanceFromCam;
@@ -112,9 +110,9 @@ void calculateForSurface(float cubeX, float cubeY, float cubeZ, Cube* cube, char
 void updateBuffers(Cube* cube) {
     const int halfCubeLength = cube->cubeWidthHeight / 2;
 
-    for (float cubeX = -halfCubeLength; cubeX < halfCubeLength; cubeX += charIncrementSpeed)
+    for (int cubeX = -halfCubeLength; cubeX < halfCubeLength; cubeX++)
     {
-        for (float cubeY = -halfCubeLength; cubeY < halfCubeLength; cubeY += charIncrementSpeed)
+        for (int cubeY = -halfCubeLength; cubeY < halfCubeLength; cubeY++)
         {
             calculateForSurface(cubeX, cubeY, -halfCubeLength, cube, FACE_1_CHARACTER);
             calculateForSurface(halfCubeLength, cubeY, cubeX, cube, FACE_2_CHARACTER);
@@ -182,19 +180,27 @@ void printCube() {
 }
 
 int main(int argc, char** argv) {
-    //    int useColors = 0;
-    //    int twoCubeMode = 0;
-    //    if (argc > 1)
-    //    {
-    //        if (strcmp(argv[1], "colors") == 0)
-    //        {
-    //            useColors = 1;
-    //        }
-    //        else if (strcmp(argv[1], "twocube") == 0)
-    //        {
-    //            twoCubeMode = 1;
-    //        }
-    //    }
+    int grayMode = 0;
+    int cubeCount = 1;
+    if (argc > 1)
+    {
+        if (strcmp(argv[1], "grayMode") == 0)
+        {
+            grayMode = 1;
+        }
+    }
+
+    if (argc > 2)
+    {
+        if (strcmp(argv[2], "2") == 0)
+        {
+            cubeCount = 2;
+        }
+        else if (strcmp(argv[2], "3") == 0)
+        {
+            cubeCount = 3;
+        }
+    }
 
     /* Initialize unicode library */
     initUnicodeLib();
@@ -215,7 +221,10 @@ int main(int argc, char** argv) {
         updateBuffers(&cube);
 
         /* Display buffers to console */
-        printToConsole(); // printCube();
+        if (grayMode)
+            printCube();
+        else
+            printToConsole();
 
         /* Rotate cube */
         rotateCube(&cube);
