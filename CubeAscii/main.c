@@ -11,8 +11,8 @@
 
 #include "cUnicodeLib.h"
 
-#define SCREEN_WIDTH 160
-#define SCREEN_HEIGHT 44
+#define SCREEN_WIDTH 60
+#define SCREEN_HEIGHT 30
 #define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)
 
 #define BACKGROUND_CHARACTER '.'
@@ -30,7 +30,7 @@ int width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
 float zBuffer[SCREEN_SIZE];
 char buffer[SCREEN_SIZE];
 int distanceFromCam = 100;
-float horizontalOffset;
+float horizontalOffset = 0;
 float K1 = 40;
 
 float incrementSpeed = 0.6;
@@ -85,7 +85,7 @@ void sleepMilliseconds(int milliseconds) {
 #endif
 }
 
-void printCube() {
+void printCubeColored() {
     printf(ESC_CURSOR_HOME);
     for (int k = 0; k < SCREEN_SIZE; k++)
     {
@@ -119,6 +119,14 @@ void printCube() {
     }
 }
 
+void printCube() {
+    printf(ESC_CURSOR_HOME);
+    for (int k = 0; k < SCREEN_SIZE; k++)
+    {
+        putchar(k % width ? buffer[k] : '\n');
+    }
+}
+
 int main() {
     initUnicodeLib();
 
@@ -128,7 +136,6 @@ int main() {
         memset(buffer, BACKGROUND_CHARACTER, (size_t)width * height);
         memset(zBuffer, 0, (unsigned long)width * height * sizeof(float));
         cubeWidth = 20;
-        horizontalOffset = -2 * cubeWidth;
 
         for (float cubeX = -cubeWidth; cubeX < cubeWidth; cubeX += incrementSpeed)
         {
@@ -142,7 +149,8 @@ int main() {
                 calculateForSurface(cubeX, cubeWidth, cubeY, FACE_6_CHARACTER);
             }
         }
-        printCube();
+        printCubeColored();
+        //        printCube();
 
         rotationX += 0.05F;
         rotationY += 0.05F;
