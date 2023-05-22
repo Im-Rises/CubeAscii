@@ -272,7 +272,13 @@ int main(int argc, char** argv) {
 
     /* Initialize cube */
     Cube cube = createCube();
+    //    Cube cubeArray[MAX_CUBE_COUNT];
+    //    for (int i = 0; i < cubeCount; i++)
+    //    {
+    //        cubeArray[i] = createCube();
+    //    }
 
+    /* Main loop */
     while (1)
     {
         /* Refresh buffers */
