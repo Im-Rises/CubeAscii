@@ -269,15 +269,34 @@ int main(int argc, char** argv) {
 
     /* Initialize cube */
     Cube cubeArray[MAX_CUBE_COUNT];
-    for (int i = 0; i < cubeCount; i++)
-    {
-        cubeArray[i] = createCube();
-    }
+    cubeArray[0] = createCube();
 
     if (cubeCount == 1)
     {
         screenWidth = 60;
         screenHeight = 30;
+    }
+    else if (cubeCount == 2)
+    {
+        /*
+         * float rotationX, float rotationY, float rotationZ, float rotationXSpeed, float rotationYSpeed,
+         * float rotationZSpeed, float cubeWidthHeight, float horizontalOffset, float verticalOffset,
+         * int distanceFromCam*/
+        screenWidth = 100;
+        screenHeight = 30;
+        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -30, 0, 100);
+        cubeArray[0].horizontalOffset = 15;
+    }
+    else if (cubeCount == 3)
+    {
+        screenWidth = 120;
+        screenHeight = 30;
+        cubeArray[2] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 10, +30, 0, 100);
+    }
+    else
+    {
+        fprintf(stderr, "Cube count must be less than %d\n", MAX_CUBE_COUNT);
+        return 1;
     }
 
     screenSize = screenWidth * screenHeight;
@@ -309,6 +328,9 @@ int main(int argc, char** argv) {
         /* Delay */
         sleepMilliseconds(FRAME_DELAY_MILLISECONDS);
     }
+
+    free(buffer);
+    free(zBuffer);
 
     return 0;
 }
