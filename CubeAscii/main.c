@@ -28,13 +28,19 @@ int screenWidth = SCREEN_WIDTH, screenHeight = SCREEN_HEIGHT;
 float zBuffer[SCREEN_SIZE];
 char buffer[SCREEN_SIZE];
 
+// struct Cube{
+//     float rotationX, rotationY, rotationZ;
+//     float rotationXSpeed, rotationYSpeed, rotationZSpeed;
+//     float cubeWidthHeight;
+// };
+
 float rotationX, rotationY, rotationZ;
 
 float rotationXSpeed = 0.05F;
 float rotationYSpeed = 0.05F;
 float rotationZSpeed = 0.01F;
 
-float cubeWidthHeight = 20;
+float cubeWidthHeight = 40;
 int distanceFromCam = 100;
 float horizontalOffset = 0;
 float verticalOffset = 0;
@@ -78,6 +84,29 @@ void calculateForSurface(float cubeX, float cubeY, float cubeZ, char ch) {
     }
 }
 
+void updateBuffers() {
+    const int halfCubeLength = cubeWidthHeight / 2;
+
+    for (float cubeX = -halfCubeLength; cubeX < halfCubeLength; cubeX += charIncrementSpeed)
+    {
+        for (float cubeY = -halfCubeLength; cubeY < halfCubeLength; cubeY += charIncrementSpeed)
+        {
+            calculateForSurface(cubeX, cubeY, -halfCubeLength, FACE_1_CHARACTER);
+            calculateForSurface(halfCubeLength, cubeY, cubeX, FACE_2_CHARACTER);
+            calculateForSurface(-halfCubeLength, cubeY, -cubeX, FACE_3_CHARACTER);
+            calculateForSurface(-cubeX, cubeY, halfCubeLength, FACE_4_CHARACTER);
+            calculateForSurface(cubeX, -halfCubeLength, -cubeY, FACE_5_CHARACTER);
+            calculateForSurface(cubeX, halfCubeLength, cubeY, FACE_6_CHARACTER);
+        }
+    }
+}
+
+void rotateCube() {
+    rotationX += rotationXSpeed;
+    rotationY += rotationYSpeed;
+    rotationZ += rotationZSpeed;
+}
+
 void sleepMilliseconds(int milliseconds) {
 #ifdef _WIN32
     Sleep(milliseconds);
@@ -86,7 +115,7 @@ void sleepMilliseconds(int milliseconds) {
 #endif
 }
 
-void printCubeColored() {
+void printToConsole() {
     printf(ESC_CURSOR_HOME);
     for (int k = 0; k < SCREEN_SIZE; k++)
     {
@@ -130,39 +159,24 @@ void printCube() {
 int main(int argc, char** argv) {
     initUnicodeLib();
 
-    //    if (argc > 1)
-    //    {
-    //        switch (argv[1][0])
-    //        {
-    //        case 'c':
-    //            break;
-    //        }
-    //    }
-
     printf(ESC_CLEAR_SCREEN);
+
     while (1)
     {
+        /* Refresh buffers */
         memset(buffer, BACKGROUND_CHARACTER, (size_t)screenWidth * screenHeight);
         memset(zBuffer, 0, (unsigned long)screenWidth * screenHeight * sizeof(float));
 
-        for (float cubeX = -cubeWidthHeight; cubeX < cubeWidthHeight; cubeX += charIncrementSpeed)
-        {
-            for (float cubeY = -cubeWidthHeight; cubeY < cubeWidthHeight; cubeY += charIncrementSpeed)
-            {
-                calculateForSurface(cubeX, cubeY, -cubeWidthHeight, FACE_1_CHARACTER);
-                calculateForSurface(cubeWidthHeight, cubeY, cubeX, FACE_2_CHARACTER);
-                calculateForSurface(-cubeWidthHeight, cubeY, -cubeX, FACE_3_CHARACTER);
-                calculateForSurface(-cubeX, cubeY, cubeWidthHeight, FACE_4_CHARACTER);
-                calculateForSurface(cubeX, -cubeWidthHeight, -cubeY, FACE_5_CHARACTER);
-                calculateForSurface(cubeX, cubeWidthHeight, cubeY, FACE_6_CHARACTER);
-            }
-        }
-        printCubeColored();
-        //        printCube();
+        /* Update buffers */
+        updateBuffers();
 
-        rotationX += rotationXSpeed;
-        rotationY += rotationYSpeed;
-        rotationZ += rotationZSpeed;
+        /* Display buffers to console */
+        printToConsole(); //        printCube();
+
+        /* Rotate cube */
+        rotateCube();
+
+        /* Delay */
         sleepMilliseconds(16);
     }
 
