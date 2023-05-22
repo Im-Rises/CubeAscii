@@ -181,7 +181,21 @@ void printCube() {
     }
 }
 
-int main() {
+int main(int argc, char** argv) {
+    //    int useColors = 0;
+    //    int twoCubeMode = 0;
+    //    if (argc > 1)
+    //    {
+    //        if (strcmp(argv[1], "colors") == 0)
+    //        {
+    //            useColors = 1;
+    //        }
+    //        else if (strcmp(argv[1], "twocube") == 0)
+    //        {
+    //            twoCubeMode = 1;
+    //        }
+    //    }
+
     /* Initialize unicode library */
     initUnicodeLib();
 
