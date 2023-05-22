@@ -9,12 +9,17 @@
 #include <unistd.h>
 #endif
 
+#include <stdlib.h>
+
 #include "cUnicodeLib.h"
 
-#define SCREEN_WIDTH 60
-#define SCREEN_HEIGHT 30
-#define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)
+#define OPTION_CUBE_COUNT "-c"
+#define OPTION_CUBE_GRAY_MODE "-g"
+#define OPTION_HELP "-h"
+
 #define FRAME_DELAY_MILLISECONDS 16
+
+#define MAX_CUBE_COUNT 3
 
 #define BACKGROUND_CHARACTER '.'
 #define FACE_1_CHARACTER '@'
@@ -24,14 +29,12 @@
 #define FACE_5_CHARACTER ';'
 #define FACE_6_CHARACTER '+'
 
-int screenWidth = SCREEN_WIDTH, screenHeight = SCREEN_HEIGHT;
+int screenWidth, screenHeight, screenSize;
 
-float zBuffer[SCREEN_SIZE];
-char buffer[SCREEN_SIZE];
+float* zBuffer;
+char* buffer;
 
 float K1 = 40;
-float charIncrementSpeed = 1.0F;
-
 
 typedef struct Cube Cube;
 struct Cube {
@@ -88,7 +91,7 @@ float calculateZ(int i, int j, int k, Cube* cube) {
     return k * cos(cube->rotationX) * cos(cube->rotationY) - j * sin(cube->rotationX) * cos(cube->rotationY) + i * sin(cube->rotationY);
 }
 
-void calculateForSurface(float cubeX, float cubeY, float cubeZ, Cube* cube, char ch) {
+void calculateForSurface(int cubeX, int cubeY, int cubeZ, Cube* cube, char ch) {
     float x = calculateX(cubeX, cubeY, cubeZ, cube);
     float y = calculateY(cubeX, cubeY, cubeZ, cube);
     float z = calculateZ(cubeX, cubeY, cubeZ, cube) + cube->distanceFromCam;
@@ -112,9 +115,9 @@ void calculateForSurface(float cubeX, float cubeY, float cubeZ, Cube* cube, char
 void updateBuffers(Cube* cube) {
     const int halfCubeLength = cube->cubeWidthHeight / 2;
 
-    for (float cubeX = -halfCubeLength; cubeX < halfCubeLength; cubeX += charIncrementSpeed)
+    for (int cubeX = -halfCubeLength; cubeX < halfCubeLength; cubeX++)
     {
-        for (float cubeY = -halfCubeLength; cubeY < halfCubeLength; cubeY += charIncrementSpeed)
+        for (int cubeY = -halfCubeLength; cubeY < halfCubeLength; cubeY++)
         {
             calculateForSurface(cubeX, cubeY, -halfCubeLength, cube, FACE_1_CHARACTER);
             calculateForSurface(halfCubeLength, cubeY, cubeX, cube, FACE_2_CHARACTER);
@@ -140,9 +143,9 @@ void sleepMilliseconds(int milliseconds) {
 #endif
 }
 
-void printToConsole() {
+void printToConsoleColored() {
     printf(ESC_CURSOR_HOME);
-    for (int k = 0; k < SCREEN_SIZE; k++)
+    for (int k = 0; k < screenSize; k++)
     {
         switch (buffer[k])
         {
@@ -173,28 +176,77 @@ void printToConsole() {
     }
 }
 
-void printCube() {
+void printToConsole() {
     printf(ESC_CURSOR_HOME);
-    for (int k = 0; k < SCREEN_SIZE; k++)
+    for (int k = 0; k < screenSize; k++)
     {
         putchar(k % screenWidth ? buffer[k] : '\n');
     }
 }
 
+void printUsage(const char* programName) {
+    printf("Usage: %s [OPTIONS]\n"
+           "Options:\n"
+           "  %s <count>    Number of cubes to render (default: 1) from 1 to %d\n"
+           "  %s            Render in gray mode\n"
+           "  %s            Print this help message\n"
+           "\n",
+        programName,
+        OPTION_CUBE_COUNT, MAX_CUBE_COUNT,
+        OPTION_CUBE_GRAY_MODE,
+        OPTION_HELP);
+}
+
+void printUnknownArgumentError(const char* argument) {
+    fprintf(stderr, "Unknown argument: %s\n", argument);
+}
+
 int main(int argc, char** argv) {
-    //    int useColors = 0;
-    //    int twoCubeMode = 0;
-    //    if (argc > 1)
-    //    {
-    //        if (strcmp(argv[1], "colors") == 0)
-    //        {
-    //            useColors = 1;
-    //        }
-    //        else if (strcmp(argv[1], "twocube") == 0)
-    //        {
-    //            twoCubeMode = 1;
-    //        }
-    //    }
+    void (*printCubePtr)() = printToConsoleColored;
+    int cubeCount = 1;
+
+    /* Handle arguments */
+    for (int i = 1; i < argc; i++)
+    {
+        printf("%s\n", argv[i]);
+        if (strcmp(argv[i], OPTION_CUBE_COUNT) == 0)
+        {
+            if (i + 1 < argc)
+            {
+                cubeCount = atoi(argv[i + 1]);
+                if (cubeCount < 1)
+                {
+                    fprintf(stderr, "Cube count must be greater than 0\n");
+                    return 1;
+                }
+                else if (cubeCount > MAX_CUBE_COUNT)
+                {
+                    fprintf(stderr, "Cube count must be less than %d\n", MAX_CUBE_COUNT);
+                    return 1;
+                }
+                i++;
+            }
+            else
+            {
+                printUsage(argv[0]);
+                return 1;
+            }
+        }
+        else if (strcmp(argv[i], OPTION_CUBE_GRAY_MODE) == 0)
+        {
+            printCubePtr = printToConsole;
+        }
+        else if (strcmp(argv[i], OPTION_HELP) == 0)
+        {
+            printUsage(argv[0]);
+            return 0;
+        }
+        else
+        {
+            printUnknownArgumentError(argv[i]);
+            return 1;
+        }
+    }
 
     /* Initialize unicode library */
     initUnicodeLib();
@@ -203,8 +255,40 @@ int main(int argc, char** argv) {
     printf(ESC_CLEAR_SCREEN);
 
     /* Initialize cube */
-    Cube cube = createCube();
+    Cube cubeArray[MAX_CUBE_COUNT];
+    cubeArray[0] = createCube();
 
+    if (cubeCount == 1)
+    {
+        screenWidth = 70;
+        screenHeight = 30;
+    }
+    else if (cubeCount == 2)
+    {
+        screenWidth = 100;
+        screenHeight = 30;
+        cubeArray[0].horizontalOffset = 15;
+        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -30, 0, 100);
+    }
+    else if (cubeCount == 3)
+    {
+        screenWidth = 120;
+        screenHeight = 30;
+        cubeArray[0].horizontalOffset = 5;
+        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -42, 0, 100);
+        cubeArray[2] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 10, +45, 0, 100);
+    }
+    else
+    {
+        fprintf(stderr, "Cube count must be less than %d\n", MAX_CUBE_COUNT);
+        return 1;
+    }
+
+    screenSize = screenWidth * screenHeight;
+    buffer = malloc(screenSize * sizeof(char));
+    zBuffer = malloc(screenSize * sizeof(float));
+
+    /* Main loop */
     while (1)
     {
         /* Refresh buffers */
@@ -212,17 +296,26 @@ int main(int argc, char** argv) {
         memset(zBuffer, 0, (unsigned long)screenWidth * screenHeight * sizeof(float));
 
         /* Update buffers */
-        updateBuffers(&cube);
+        for (int i = 0; i < cubeCount; i++)
+        {
+            updateBuffers(&cubeArray[i]);
+        }
 
         /* Display buffers to console */
-        printToConsole(); // printCube();
+        printCubePtr();
 
         /* Rotate cube */
-        rotateCube(&cube);
+        for (int i = 0; i < cubeCount; i++)
+        {
+            rotateCube(&cubeArray[i]);
+        }
 
         /* Delay */
         sleepMilliseconds(FRAME_DELAY_MILLISECONDS);
     }
+
+    free(buffer);
+    free(zBuffer);
 
     return 0;
 }

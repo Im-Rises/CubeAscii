@@ -10,6 +10,44 @@ color.
 
 https://github.com/Im-Rises/cubeAscii/assets/59691442/f5bd5eae-67f1-4b75-88f0-6140808ba2f8
 
+## How to use
+
+### Build
+
+To build the project, you need to have `CMake` installed on your computer.  
+Then, you can run the following commands:
+
+```bash
+mkdir build
+cd build
+cmake ..
+cmake --build .
+```
+
+### Run
+
+To run the project, you can run the following command:
+
+```bash
+./cubeAscii
+```
+
+### Options
+
+You can use the following options:
+
+- `-h` : to display the usage
+- `-c <count>` : to set the number of cubes to display (default: 1) choose between 1 and 3
+- `-g` :  to display in gray mode the cubes
+
+You can combine the commands to set the number of cubes and to display in gray mode at the same time:
+
+```bash
+./cubeAscii -c 3 -g
+```
+
+This will display 3 cubes in gray mode.
+
 ## Github-Actions
 
 [![flawfinder](https://github.com/Im-Rises/CubeAscii/actions/workflows/flawfinder.yml/badge.svg?branch=main)](https://github.com/Im-Rises/CubeAscii/actions/workflows/flawfinder.yml)
