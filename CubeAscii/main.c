@@ -110,7 +110,7 @@ void printCubeColored() {
             printf(ESC_FG_CYAN);
             break;
         case BACKGROUND_CHARACTER:
-            printf(ESC_RESET_ALL);
+            printf(ESC_RESET_FG);
             break;
         }
 
