@@ -89,7 +89,6 @@ void printCubeColored() {
     printf(ESC_CURSOR_HOME);
     for (int k = 0; k < SCREEN_SIZE; k++)
     {
-
         switch (buffer[k])
         {
         case FACE_1_CHARACTER:
@@ -110,7 +109,7 @@ void printCubeColored() {
         case FACE_6_CHARACTER:
             printf(ESC_FG_CYAN);
             break;
-        case '.':
+        case BACKGROUND_CHARACTER:
             printf(ESC_RESET_ALL);
             break;
         }
