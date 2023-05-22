@@ -209,130 +209,113 @@ int main(int argc, char** argv) {
     for (int i = 1; i < argc; i++)
     {
         printf("%s\n", argv[i]);
-        switch (argv[i][0])
+        if (strcmp(argv[i], OPTION_CUBE_COUNT) == 0)
         {
-        case '-':
-            if (strcmp(argv[i], OPTION_CUBE_COUNT) == 0)
+            if (i + 1 < argc)
             {
-                if (i + 1 < argc)
+                cubeCount = atoi(argv[i + 1]);
+                if (cubeCount < 1)
                 {
-                    cubeCount = atoi(argv[i + 1]);
-                    if (cubeCount < 1)
-                    {
-                        fprintf(stderr, "Cube count must be greater than 0\n");
-                        return 1;
-                    }
-                    else if (cubeCount > MAX_CUBE_COUNT)
-                    {
-                        fprintf(stderr, "Cube count must be less than %d\n", MAX_CUBE_COUNT);
-                        return 1;
-                    }
-                    i++;
-                }
-                else
-                {
-                    printUsage(argv[0]);
+                    fprintf(stderr, "Cube count must be greater than 0\n");
                     return 1;
                 }
-            }
-            else if (strcmp(argv[i], OPTION_CUBE_GRAY_MODE) == 0)
-            {
-                if (i + 1 < argc)
+                else if (cubeCount > MAX_CUBE_COUNT)
                 {
-                    printCubePtr = printToConsole;
-                    i++;
-                }
-                else
-                {
-                    printUsage(argv[0]);
+                    fprintf(stderr, "Cube count must be less than %d\n", MAX_CUBE_COUNT);
                     return 1;
                 }
-            }
-            else if (strcmp(argv[i], OPTION_HELP) == 0)
-            {
-                printUsage(argv[0]);
-                return 0;
+                i++;
             }
             else
             {
-                printUnknownArgumentError(argv[i]);
+                printUsage(argv[0]);
                 return 1;
             }
-            break;
-        default:
+        }
+        else if (strcmp(argv[i], OPTION_CUBE_GRAY_MODE) == 0)
+        {
+            printCubePtr = printToConsole;
+        }
+        else if (strcmp(argv[i], OPTION_HELP) == 0)
+        {
             printUsage(argv[0]);
+            return 0;
+        }
+        else
+        {
+            printUnknownArgumentError(argv[i]);
             return 1;
         }
     }
 
-    //    /* Initialize unicode library */
-    //    initUnicodeLib();
-    //
-    //    /* Clear screen */
-    //    printf(ESC_CLEAR_SCREEN);
-    //
-    //    /* Initialize cube */
-    //    Cube cubeArray[MAX_CUBE_COUNT];
-    //    cubeArray[0] = createCube();
-    //
-    //    if (cubeCount == 1)
-    //    {
-    //        screenWidth = 70;
-    //        screenHeight = 30;
-    //    }
-    //    else if (cubeCount == 2)
-    //    {
-    //        screenWidth = 100;
-    //        screenHeight = 30;
-    //        cubeArray[0].horizontalOffset = 15;
-    //        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -30, 0, 100);
-    //    }
-    //    else if (cubeCount == 3)
-    //    {
-    //        screenWidth = 120;
-    //        screenHeight = 30;
-    //        cubeArray[0].horizontalOffset = 5;
-    //        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -42, 0, 100);
-    //        cubeArray[2] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 10, +45, 0, 100);
-    //    }
-    //    else
-    //    {
-    //        fprintf(stderr, "Cube count must be less than %d\n", MAX_CUBE_COUNT);
-    //        return 1;
-    //    }
-    //
-    //    screenSize = screenWidth * screenHeight;
-    //    buffer = malloc(screenSize * sizeof(char));
-    //    zBuffer = malloc(screenSize * sizeof(float));
-    //
-    //    /* Main loop */
-    //    while (1)
-    //    {
-    //        /* Refresh buffers */
-    //        memset(buffer, BACKGROUND_CHARACTER, (size_t)screenWidth * screenHeight);
-    //        memset(zBuffer, 0, (unsigned long)screenWidth * screenHeight * sizeof(float));
-    //
-    //        /* Update buffers */
-    //        for (int i = 0; i < cubeCount; i++)
-    //        {
-    //            updateBuffers(&cubeArray[i]);
-    //        }
-    //
-    //        /* Display buffers to console */
-    //        printCubePtr();
-    //
-    //        /* Rotate cube */
-    //        for (int i = 0; i < cubeCount; i++)
-    //        {
-    //            rotateCube(&cubeArray[i]);
-    //        }
-    //
-    //        /* Delay */
-    //        sleepMilliseconds(FRAME_DELAY_MILLISECONDS);
-    //    }
-    //
-    //    free(buffer);
-    //    free(zBuffer);
-    //
-    //    return 0;
+    /* Initialize unicode library */
+    initUnicodeLib();
+
+    /* Clear screen */
+    printf(ESC_CLEAR_SCREEN);
+
+    /* Initialize cube */
+    Cube cubeArray[MAX_CUBE_COUNT];
+    cubeArray[0] = createCube();
+
+    if (cubeCount == 1)
+    {
+        screenWidth = 70;
+        screenHeight = 30;
+    }
+    else if (cubeCount == 2)
+    {
+        screenWidth = 100;
+        screenHeight = 30;
+        cubeArray[0].horizontalOffset = 15;
+        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -30, 0, 100);
+    }
+    else if (cubeCount == 3)
+    {
+        screenWidth = 120;
+        screenHeight = 30;
+        cubeArray[0].horizontalOffset = 5;
+        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -42, 0, 100);
+        cubeArray[2] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 10, +45, 0, 100);
+    }
+    else
+    {
+        fprintf(stderr, "Cube count must be less than %d\n", MAX_CUBE_COUNT);
+        return 1;
+    }
+
+    screenSize = screenWidth * screenHeight;
+    buffer = malloc(screenSize * sizeof(char));
+    zBuffer = malloc(screenSize * sizeof(float));
+
+    /* Main loop */
+    while (1)
+    {
+        /* Refresh buffers */
+        memset(buffer, BACKGROUND_CHARACTER, (size_t)screenWidth * screenHeight);
+        memset(zBuffer, 0, (unsigned long)screenWidth * screenHeight * sizeof(float));
+
+        /* Update buffers */
+        for (int i = 0; i < cubeCount; i++)
+        {
+            updateBuffers(&cubeArray[i]);
+        }
+
+        /* Display buffers to console */
+        printCubePtr();
+
+        /* Rotate cube */
+        for (int i = 0; i < cubeCount; i++)
+        {
+            rotateCube(&cubeArray[i]);
+        }
+
+        /* Delay */
+        sleepMilliseconds(FRAME_DELAY_MILLISECONDS);
+    }
+
+    free(buffer);
+    free(zBuffer);
+
+    return 0;
 }
