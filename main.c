@@ -16,13 +16,20 @@
 #define SCREEN_HEIGHT 44
 #define SCREEN_SIZE (SCREEN_WIDTH * SCREEN_HEIGHT)
 
+#define BACKGROUND_CHARACTER '.'
+#define FACE_1_CHARACTER '@'
+#define FACE_2_CHARACTER '$'
+#define FACE_3_CHARACTER '~'
+#define FACE_4_CHARACTER '#'
+#define FACE_5_CHARACTER ';'
+#define FACE_6_CHARACTER '+'
+
 float rotationX, rotationY, rotationZ;
 
 float cubeWidth = 20;
 int width = SCREEN_WIDTH, height = SCREEN_HEIGHT;
 float zBuffer[SCREEN_SIZE];
 char buffer[SCREEN_SIZE];
-int backgroundASCIICode = '.';
 int distanceFromCam = 100;
 float horizontalOffset;
 float K1 = 40;
@@ -77,27 +84,27 @@ void sleepMilliseconds(int milliseconds) {
 #endif
 }
 
-void printBuffer() {
+void printCube() {
     printf(ESC_CURSOR_HOME);
     for (int k = 0; k < SCREEN_SIZE; k++) {
 
         switch (buffer[k]) {
-            case '@':
+            case FACE_1_CHARACTER:
                 printf(ESC_FG_RED);
                 break;
-            case '$':
+            case FACE_2_CHARACTER:
                 printf(ESC_FG_GREEN);
                 break;
-            case '~':
+            case FACE_3_CHARACTER:
                 printf(ESC_FG_BLUE);
                 break;
-            case '#':
+            case FACE_4_CHARACTER:
                 printf(ESC_FG_YELLOW);
                 break;
-            case ';':
+            case FACE_5_CHARACTER:
                 printf(ESC_FG_MAGENTA);
                 break;
-            case '+':
+            case FACE_6_CHARACTER:
                 printf(ESC_FG_CYAN);
                 break;
             case '.':
@@ -114,22 +121,22 @@ int main() {
 
     printf(ESC_CLEAR_SCREEN);
     while (1) {
-        memset(buffer, backgroundASCIICode, width * height);
+        memset(buffer, BACKGROUND_CHARACTER, width * height);
         memset(zBuffer, 0, width * height * sizeof(float));
         cubeWidth = 20;
         horizontalOffset = -2 * cubeWidth;
-        // first cube
+
         for (float cubeX = -cubeWidth; cubeX < cubeWidth; cubeX += incrementSpeed) {
             for (float cubeY = -cubeWidth; cubeY < cubeWidth; cubeY += incrementSpeed) {
-                calculateForSurface(cubeX, cubeY, -cubeWidth, '@');
-                calculateForSurface(cubeWidth, cubeY, cubeX, '$');
-                calculateForSurface(-cubeWidth, cubeY, -cubeX, '~');
-                calculateForSurface(-cubeX, cubeY, cubeWidth, '#');
-                calculateForSurface(cubeX, -cubeWidth, -cubeY, ';');
-                calculateForSurface(cubeX, cubeWidth, cubeY, '+');
+                calculateForSurface(cubeX, cubeY, -cubeWidth, FACE_1_CHARACTER);
+                calculateForSurface(cubeWidth, cubeY, cubeX, FACE_2_CHARACTER);
+                calculateForSurface(-cubeWidth, cubeY, -cubeX, FACE_3_CHARACTER);
+                calculateForSurface(-cubeX, cubeY, cubeWidth, FACE_4_CHARACTER);
+                calculateForSurface(cubeX, -cubeWidth, -cubeY, FACE_5_CHARACTER);
+                calculateForSurface(cubeX, cubeWidth, cubeY, FACE_6_CHARACTER);
             }
         }
-        printBuffer();
+        printCube();
 
         rotationX += 0.05;
         rotationY += 0.05;
