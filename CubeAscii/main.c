@@ -51,7 +51,7 @@ Cube createCube() {
     cube.rotationY = 0;
     cube.rotationZ = 0;
     cube.rotationXSpeed = 0.05F;
-    cube.rotationYSpeed = 0.05F;
+    cube.rotationYSpeed = 0.04F;
     cube.rotationZSpeed = 0.01F;
     cube.cubeWidthHeight = 40;
     cube.horizontalOffset = 0;
@@ -145,34 +145,39 @@ void sleepMilliseconds(int milliseconds) {
 
 void printToConsoleColored() {
     printf(ESC_CURSOR_HOME);
+    char prevChar = '\0'; // Initialize with null character
     for (int k = 0; k < screenSize; k++)
     {
-        switch (buffer[k])
+        if (buffer[k] != prevChar)
         {
-        case FACE_1_CHARACTER:
-            printf(ESC_FG_RED);
-            break;
-        case FACE_2_CHARACTER:
-            printf(ESC_FG_GREEN);
-            break;
-        case FACE_3_CHARACTER:
-            printf(ESC_FG_BLUE);
-            break;
-        case FACE_4_CHARACTER:
-            printf(ESC_FG_YELLOW);
-            break;
-        case FACE_5_CHARACTER:
-            printf(ESC_FG_MAGENTA);
-            break;
-        case FACE_6_CHARACTER:
-            printf(ESC_FG_CYAN);
-            break;
-        case BACKGROUND_CHARACTER:
-            printf(ESC_RESET_FG);
-            break;
+            switch (buffer[k])
+            {
+            case FACE_1_CHARACTER:
+                printf(ESC_FG_RED);
+                break;
+            case FACE_2_CHARACTER:
+                printf(ESC_FG_GREEN);
+                break;
+            case FACE_3_CHARACTER:
+                printf(ESC_FG_BLUE);
+                break;
+            case FACE_4_CHARACTER:
+                printf(ESC_FG_YELLOW);
+                break;
+            case FACE_5_CHARACTER:
+                printf(ESC_FG_MAGENTA);
+                break;
+            case FACE_6_CHARACTER:
+                printf(ESC_FG_CYAN);
+                break;
+            case BACKGROUND_CHARACTER:
+                printf(ESC_RESET_FG);
+                break;
+            }
         }
 
         putchar(k % screenWidth ? buffer[k] : '\n');
+        prevChar = buffer[k];
     }
 }
 
@@ -268,15 +273,15 @@ int main(int argc, char** argv) {
         screenWidth = 100;
         screenHeight = 30;
         cubeArray[0].horizontalOffset = 15;
-        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -30, 0, 100);
+        cubeArray[1] = createCustomCube(0, 0, 0, 0.04F, 0.05F, -0.02F, 20, -30, 0, 100);
     }
     else if (cubeCount == 3)
     {
         screenWidth = 120;
         screenHeight = 30;
         cubeArray[0].horizontalOffset = 5;
-        cubeArray[1] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 20, -42, 0, 100);
-        cubeArray[2] = createCustomCube(0, 0, 0, -0.03F, 0.05F, -0.02F, 10, +45, 0, 100);
+        cubeArray[1] = createCustomCube(0, 0, 0, 0.04F, 0.05F, -0.02F, 20, -42, 0, 100);
+        cubeArray[2] = createCustomCube(0, 0, 0, 0.01F, -0.05F, 0.04F, 10, +45, 0, 100);
     }
     else
     {
