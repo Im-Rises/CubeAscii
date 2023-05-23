@@ -22,6 +22,8 @@
 
 #define MAX_CUBE_COUNT 3
 
+#define WITH_HEIGHT_SCALE_FACTOR 2
+
 #define MIN_ROTATION_SPEED -0.1F
 #define MAX_ROTATION_SPEED 0.1F
 
@@ -110,7 +112,7 @@ void calculateForSurface(int cubeX, int cubeY, int cubeZ, Cube* cube, char ch) {
     float ooz = 1 / z;
 
     // 2D projection coordinates
-    int xp = (int)(screenWidth / 2 + cube->horizontalOffset + K1 * ooz * x * 2); // Multiplied by two to have a better aspect ratio
+    int xp = (int)(screenWidth / 2 + cube->horizontalOffset + K1 * ooz * x * WITH_HEIGHT_SCALE_FACTOR); // Multiplied by WITH_HEIGHT_SCALE_FACTOR to compensate for the height scale factor
     int yp = (int)(screenHeight / 2 + cube->verticalOffset + K1 * ooz * y);
 
     // Draw the character on the buffer according to its z coordinate
