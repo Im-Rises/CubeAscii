@@ -1,4 +1,5 @@
 #pragma clang diagnostic push
+#pragma ide diagnostic ignored "readability-suspicious-call-argument"
 #pragma ide diagnostic ignored "modernize-macro-to-enum"
 #include <math.h>
 #include <stddef.h>
@@ -204,7 +205,7 @@ void printToConsoleColored(Screen* screen) {
     }
 }
 
-void clearScreen(Screen* screen) {
+void clearScreenBuffers(Screen* screen) {
     memset(screen->buffer, BACKGROUND_CHARACTER, (size_t)screen->size);
     memset(screen->zBuffer, 0, (unsigned long)screen->size * sizeof(float));
 }
@@ -248,7 +249,7 @@ int main(int argc, char** argv) {
     srand(time(NULL));
 
     /* Argument variables */
-    void (*printCubePtr)() = printToConsoleColored;
+    void (*printCubePtr)(Screen*) = printToConsoleColored;
     int cubeCount = 1;
 
     /* Handle arguments */
@@ -348,7 +349,7 @@ int main(int argc, char** argv) {
     while (1)
     {
         /* Refresh buffers */
-        clearScreen(&screen);
+        clearScreenBuffers(&screen);
 
         /* Update buffers */
         for (int i = 0; i < cubeCount; i++)
