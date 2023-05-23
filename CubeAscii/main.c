@@ -79,6 +79,11 @@ Cube createCustomCube(float rotationX, float rotationY, float rotationZ, float r
     return cube;
 }
 
+/*
+ * The three functions below are multiplication of the rotation matrix with the coordinates of a point.
+ * Each one is used to calculate the position of a 3D point rotation around a specific axis (according to the cube rotation value).
+ */
+
 float calculateX(int i, int j, int k, Cube* cube) {
     return j * sin(cube->rotationX) * sin(cube->rotationY) * cos(cube->rotationZ) - k * cos(cube->rotationX) * sin(cube->rotationY) * cos(cube->rotationZ) +
            j * cos(cube->rotationX) * sin(cube->rotationZ) + k * sin(cube->rotationX) * sin(cube->rotationZ) +
@@ -96,15 +101,20 @@ float calculateZ(int i, int j, int k, Cube* cube) {
 }
 
 void calculateForSurface(int cubeX, int cubeY, int cubeZ, Cube* cube, char ch) {
+    // Calculate 3D coordinates
     float x = calculateX(cubeX, cubeY, cubeZ, cube);
     float y = calculateY(cubeX, cubeY, cubeZ, cube);
     float z = calculateZ(cubeX, cubeY, cubeZ, cube) + cube->distanceFromCam;
 
+    // Perspective projection
     float ooz = 1 / z;
 
-    int xp = (int)(screenWidth / 2 + cube->horizontalOffset + K1 * ooz * x * 2);
+    // 2D projection coordinates
+    int xp = (int)(screenWidth / 2 + cube->horizontalOffset + K1 * ooz * x * 2); // Multiplied by two to have a better aspect ratio
     int yp = (int)(screenHeight / 2 + cube->verticalOffset + K1 * ooz * y);
 
+    // Draw the character on the buffer according to its z coordinate
+    // (if the z coordinate is closer to the camera than the previous one, it will be drawn on top of it)
     int idx = xp + yp * screenWidth;
     if (idx >= 0 && idx < screenWidth * screenHeight)
     {
@@ -119,6 +129,8 @@ void calculateForSurface(int cubeX, int cubeY, int cubeZ, Cube* cube, char ch) {
 void updateBuffers(Cube* cube) {
     const int halfCubeLength = cube->cubeWidthHeight / 2;
 
+    // Update the z buffer and text buffer with the cube points
+    // Iterate through each points of a face of the cube and put it in the buffers
     for (int cubeX = -halfCubeLength; cubeX < halfCubeLength; cubeX++)
     {
         for (int cubeY = -halfCubeLength; cubeY < halfCubeLength; cubeY++)
@@ -139,13 +151,13 @@ void rotateCube(Cube* cube) {
     cube->rotationZ += cube->rotationZSpeed;
 }
 
-void sleepMilliseconds(int milliseconds) {
-#ifdef _WIN32
-    Sleep(milliseconds);
-#else
-    usleep(milliseconds * 1000);
-#endif
-}
+// void sleepMilliseconds(int milliseconds) {
+// #ifdef _WIN32
+//     Sleep(milliseconds);
+// #else
+//     usleep(milliseconds * 1000);
+// #endif
+// }
 
 void printToConsoleColored() {
     printf(ESC_CURSOR_HOME);
