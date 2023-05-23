@@ -1,3 +1,5 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "modernize-macro-to-enum"
 #include <math.h>
 #include <stddef.h>
 #include <stdio.h>
@@ -24,7 +26,7 @@
 
 #define WITH_HEIGHT_SCALE_FACTOR 2
 
-#define MIN_ROTATION_SPEED -0.1F
+#define MIN_ROTATION_SPEED (-0.1F)
 #define MAX_ROTATION_SPEED 0.1F
 
 #define BACKGROUND_CHARACTER '.'
@@ -40,7 +42,7 @@ int screenWidth, screenHeight, screenSize;
 float* zBuffer;
 char* buffer;
 
-float K1 = 40;
+const float K1 = 40;
 
 typedef struct Cube Cube;
 struct Cube {
@@ -86,34 +88,34 @@ Cube createCustomCube(float rotationX, float rotationY, float rotationZ, float r
  * Each one is used to calculate the position of a 3D point rotation around a specific axis (according to the cube rotation value).
  */
 
-float calculateX(int i, int j, int k, Cube* cube) {
-    return j * sin(cube->rotationX) * sin(cube->rotationY) * cos(cube->rotationZ) - k * cos(cube->rotationX) * sin(cube->rotationY) * cos(cube->rotationZ) +
-           j * cos(cube->rotationX) * sin(cube->rotationZ) + k * sin(cube->rotationX) * sin(cube->rotationZ) +
-           i * cos(cube->rotationY) * cos(cube->rotationZ);
+float calculateX(float i, float j, float k, Cube* cube) {
+    return j * sinf(cube->rotationX) * sinf(cube->rotationY) * cosf(cube->rotationZ) - k * cosf(cube->rotationX) * sinf(cube->rotationY) * cosf(cube->rotationZ) +
+           j * cosf(cube->rotationX) * sinf(cube->rotationZ) + k * sinf(cube->rotationX) * sinf(cube->rotationZ) +
+           i * cosf(cube->rotationY) * cosf(cube->rotationZ);
 }
 
-float calculateY(int i, int j, int k, Cube* cube) {
-    return j * cos(cube->rotationX) * cos(cube->rotationZ) + k * sin(cube->rotationX) * cos(cube->rotationZ) -
-           j * sin(cube->rotationX) * sin(cube->rotationY) * sin(cube->rotationZ) + k * cos(cube->rotationX) * sin(cube->rotationY) * sin(cube->rotationZ) -
-           i * cos(cube->rotationY) * sin(cube->rotationZ);
+float calculateY(float i, float j, float k, Cube* cube) {
+    return j * cosf(cube->rotationX) * cosf(cube->rotationZ) + k * sinf(cube->rotationX) * cosf(cube->rotationZ) -
+           j * sinf(cube->rotationX) * sinf(cube->rotationY) * sinf(cube->rotationZ) + k * cosf(cube->rotationX) * sinf(cube->rotationY) * sinf(cube->rotationZ) -
+           i * cosf(cube->rotationY) * sinf(cube->rotationZ);
 }
 
-float calculateZ(int i, int j, int k, Cube* cube) {
-    return k * cos(cube->rotationX) * cos(cube->rotationY) - j * sin(cube->rotationX) * cos(cube->rotationY) + i * sin(cube->rotationY);
+float calculateZ(float i, float j, float k, Cube* cube) {
+    return k * cosf(cube->rotationX) * cosf(cube->rotationY) - j * sinf(cube->rotationX) * cosf(cube->rotationY) + i * sinf(cube->rotationY);
 }
 
 void calculateForSurface(int cubeX, int cubeY, int cubeZ, Cube* cube, char ch) {
     // Calculate 3D coordinates
-    float x = calculateX(cubeX, cubeY, cubeZ, cube);
-    float y = calculateY(cubeX, cubeY, cubeZ, cube);
-    float z = calculateZ(cubeX, cubeY, cubeZ, cube) + cube->distanceFromCam;
+    float x = calculateX((float)cubeX, (float)cubeY, (float)cubeZ, cube);
+    float y = calculateY((float)cubeX, (float)cubeY, (float)cubeZ, cube);
+    float z = calculateZ((float)cubeX, (float)cubeY, (float)cubeZ, cube) + (float)cube->distanceFromCam;
 
     // Perspective projection
     float ooz = 1 / z;
 
     // 2D projection coordinates
-    int xp = (int)(screenWidth / 2 + cube->horizontalOffset + K1 * ooz * x * WITH_HEIGHT_SCALE_FACTOR); // Multiplied by WITH_HEIGHT_SCALE_FACTOR to compensate for the height scale factor
-    int yp = (int)(screenHeight / 2 + cube->verticalOffset + K1 * ooz * y);
+    int xp = (int)((float)screenWidth / 2 + cube->horizontalOffset + K1 * ooz * x * WITH_HEIGHT_SCALE_FACTOR); // Multiplied by WITH_HEIGHT_SCALE_FACTOR to compensate for the height scale factor
+    int yp = (int)((float)screenHeight / 2 + cube->verticalOffset + K1 * ooz * y);
 
     // Draw the character on the buffer according to its z coordinate
     // (if the z coordinate is closer to the camera than the previous one, it will be drawn on top of it)
@@ -129,7 +131,7 @@ void calculateForSurface(int cubeX, int cubeY, int cubeZ, Cube* cube, char ch) {
 }
 
 void updateBuffers(Cube* cube) {
-    const int halfCubeLength = cube->cubeWidthHeight / 2;
+    const int halfCubeLength = (int)(cube->cubeWidthHeight / 2);
 
     // Update the z buffer and text buffer with the cube points
     // Iterate through each points of a face of the cube and put it in the buffers
@@ -208,7 +210,7 @@ void printToConsole() {
 }
 
 float randomFloat(float min, float max) {
-    float scale = rand() / (float)RAND_MAX;
+    float scale = (float)rand() / (float)RAND_MAX;
     return min + scale * (max - min);
 }
 
@@ -331,6 +333,8 @@ int main(int argc, char** argv) {
     clock_t startClock = clock();
 
     /* Main loop */
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "EndlessLoop"
     while (1)
     {
         /* Refresh buffers */
@@ -360,9 +364,12 @@ int main(int argc, char** argv) {
         }
         startClock = endClock;
     }
+#pragma clang diagnostic pop
 
     free(buffer);
     free(zBuffer);
 
     return 0;
 }
+
+#pragma clang diagnostic pop
