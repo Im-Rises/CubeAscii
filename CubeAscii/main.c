@@ -37,10 +37,13 @@
 #define FACE_5_CHARACTER ';'
 #define FACE_6_CHARACTER '+'
 
-int screenWidth, screenHeight, screenSize;
-
-float* zBuffer;
-char* buffer;
+typedef struct Screen Screen;
+struct Screen {
+    int width, height;
+    int size;
+    float* zBuffer;
+    char* buffer;
+};
 
 const float K1 = 40;
 
@@ -104,7 +107,7 @@ float calculateZ(float i, float j, float k, Cube* cube) {
     return k * cosf(cube->rotationX) * cosf(cube->rotationY) - j * sinf(cube->rotationX) * cosf(cube->rotationY) + i * sinf(cube->rotationY);
 }
 
-void calculateForSurface(int cubeX, int cubeY, int cubeZ, Cube* cube, char ch) {
+void calculateForSurface(Screen* screen, int cubeX, int cubeY, int cubeZ, Cube* cube, char ch) {
     // Calculate 3D coordinates
     float x = calculateX((float)cubeX, (float)cubeY, (float)cubeZ, cube);
     float y = calculateY((float)cubeX, (float)cubeY, (float)cubeZ, cube);
@@ -114,23 +117,23 @@ void calculateForSurface(int cubeX, int cubeY, int cubeZ, Cube* cube, char ch) {
     float ooz = 1 / z;
 
     // 2D projection coordinates
-    int xp = (int)((float)screenWidth / 2 + cube->horizontalOffset + K1 * ooz * x * WITH_HEIGHT_SCALE_FACTOR); // Multiplied by WITH_HEIGHT_SCALE_FACTOR to compensate for the height scale factor
-    int yp = (int)((float)screenHeight / 2 + cube->verticalOffset + K1 * ooz * y);
+    int xp = (int)((float)screen->width / 2 + cube->horizontalOffset + K1 * ooz * x * WITH_HEIGHT_SCALE_FACTOR); // Multiplied by WITH_HEIGHT_SCALE_FACTOR to compensate for the height scale factor
+    int yp = (int)((float)screen->height / 2 + cube->verticalOffset + K1 * ooz * y);
 
     // Draw the character on the buffer according to its z coordinate
     // (if the z coordinate is closer to the camera than the previous one, it will be drawn on top of it)
-    int idx = xp + yp * screenWidth;
-    if (idx >= 0 && idx < screenWidth * screenHeight)
+    int idx = xp + yp * screen->width;
+    if (idx >= 0 && idx < screen->size)
     {
-        if (ooz > zBuffer[idx])
+        if (ooz > screen->zBuffer[idx])
         {
-            zBuffer[idx] = ooz;
-            buffer[idx] = ch;
+            screen->zBuffer[idx] = ooz;
+            screen->buffer[idx] = ch;
         }
     }
 }
 
-void updateBuffers(Cube* cube) {
+void updateBuffers(Screen* screen, Cube* cube) {
     const int halfCubeLength = (int)(cube->cubeWidthHeight / 2);
 
     // Update the z buffer and text buffer with the cube points
@@ -139,12 +142,12 @@ void updateBuffers(Cube* cube) {
     {
         for (int cubeY = -halfCubeLength; cubeY < halfCubeLength; cubeY++)
         {
-            calculateForSurface(cubeX, cubeY, -halfCubeLength, cube, FACE_1_CHARACTER);
-            calculateForSurface(halfCubeLength, cubeY, cubeX, cube, FACE_2_CHARACTER);
-            calculateForSurface(-halfCubeLength, cubeY, -cubeX, cube, FACE_3_CHARACTER);
-            calculateForSurface(-cubeX, cubeY, halfCubeLength, cube, FACE_4_CHARACTER);
-            calculateForSurface(cubeX, -halfCubeLength, -cubeY, cube, FACE_5_CHARACTER);
-            calculateForSurface(cubeX, halfCubeLength, cubeY, cube, FACE_6_CHARACTER);
+            calculateForSurface(screen, cubeX, cubeY, -halfCubeLength, cube, FACE_1_CHARACTER);
+            calculateForSurface(screen, halfCubeLength, cubeY, cubeX, cube, FACE_2_CHARACTER);
+            calculateForSurface(screen, -halfCubeLength, cubeY, -cubeX, cube, FACE_3_CHARACTER);
+            calculateForSurface(screen, -cubeX, cubeY, halfCubeLength, cube, FACE_4_CHARACTER);
+            calculateForSurface(screen, cubeX, -halfCubeLength, -cubeY, cube, FACE_5_CHARACTER);
+            calculateForSurface(screen, cubeX, halfCubeLength, cubeY, cube, FACE_6_CHARACTER);
         }
     }
 }
@@ -163,14 +166,14 @@ void rotateCube(Cube* cube) {
 // #endif
 // }
 
-void printToConsoleColored() {
+void printToConsoleColored(Screen* screen) {
     printf(ESC_CURSOR_HOME);
     char prevChar = '\0'; // Initialize with null character
-    for (int k = 0; k < screenSize; k++)
+    for (int k = 0; k < screen->size; k++)
     {
-        if (buffer[k] != prevChar)
+        if (screen->buffer[k] != prevChar)
         {
-            switch (buffer[k])
+            switch (screen->buffer[k])
             {
             case FACE_1_CHARACTER:
                 printf(ESC_FG_RED);
@@ -196,16 +199,21 @@ void printToConsoleColored() {
             }
         }
 
-        putchar(k % screenWidth ? buffer[k] : '\n');
-        prevChar = buffer[k];
+        putchar(k % screen->width ? screen->buffer[k] : '\n');
+        prevChar = screen->buffer[k];
     }
 }
 
-void printToConsole() {
+void clearScreen(Screen* screen) {
+    memset(screen->buffer, BACKGROUND_CHARACTER, (size_t)screen->size);
+    memset(screen->zBuffer, 0, (unsigned long)screen->size * sizeof(float));
+}
+
+void printToConsole(Screen* screen) {
     printf(ESC_CURSOR_HOME);
-    for (int k = 0; k < screenSize; k++)
+    for (int k = 0; k < screen->size; k++)
     {
-        putchar(k % screenWidth ? buffer[k] : '\n');
+        putchar(k % screen->width ? screen->buffer[k] : '\n');
     }
 }
 
@@ -299,22 +307,24 @@ int main(int argc, char** argv) {
     cubeArray[0].rotationYSpeed = randomRotationValue();
     cubeArray[0].rotationZSpeed = randomRotationValue();
 
+    /* Initialize screen and cubes */
+    Screen screen;
     if (cubeCount == 1)
     {
-        screenWidth = 70;
-        screenHeight = 30;
+        screen.width = 70;
+        screen.height = 30;
     }
     else if (cubeCount == 2)
     {
-        screenWidth = 100;
-        screenHeight = 30;
+        screen.width = 100;
+        screen.height = 30;
         cubeArray[0].horizontalOffset = 15;
         cubeArray[1] = createCustomCube(0, 0, 0, randomRotationValue(), randomRotationValue(), randomRotationValue(), 20, -30, 0, 100);
     }
     else if (cubeCount == 3)
     {
-        screenWidth = 120;
-        screenHeight = 30;
+        screen.width = 120;
+        screen.height = 30;
         cubeArray[0].horizontalOffset = 5;
         cubeArray[1] = createCustomCube(0, 0, 0, randomRotationValue(), randomRotationValue(), randomRotationValue(), 20, -42, 0, 100);
         cubeArray[2] = createCustomCube(0, 0, 0, randomRotationValue(), randomRotationValue(), randomRotationValue(), 10, +45, 0, 100);
@@ -325,9 +335,9 @@ int main(int argc, char** argv) {
         return 1;
     }
 
-    screenSize = screenWidth * screenHeight;
-    buffer = malloc(screenSize * sizeof(char));
-    zBuffer = malloc(screenSize * sizeof(float));
+    screen.size = screen.width * screen.height;
+    screen.buffer = malloc(screen.size * sizeof(char));
+    screen.zBuffer = malloc(screen.size * sizeof(float));
 
     // start timer
     clock_t startClock = clock();
@@ -338,17 +348,16 @@ int main(int argc, char** argv) {
     while (1)
     {
         /* Refresh buffers */
-        memset(buffer, BACKGROUND_CHARACTER, (size_t)screenWidth * screenHeight);
-        memset(zBuffer, 0, (unsigned long)screenWidth * screenHeight * sizeof(float));
+        clearScreen(&screen);
 
         /* Update buffers */
         for (int i = 0; i < cubeCount; i++)
         {
-            updateBuffers(&cubeArray[i]);
+            updateBuffers(&screen, &cubeArray[i]);
         }
 
         /* Display buffers to console */
-        printCubePtr();
+        printCubePtr(&screen);
 
         /* Rotate cube */
         for (int i = 0; i < cubeCount; i++)
@@ -366,8 +375,8 @@ int main(int argc, char** argv) {
     }
 #pragma clang diagnostic pop
 
-    free(buffer);
-    free(zBuffer);
+    free(screen.buffer);
+    free(screen.zBuffer);
 
     return 0;
 }
