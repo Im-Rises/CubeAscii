@@ -313,6 +313,9 @@ int main(int argc, char** argv) {
     buffer = malloc(screenSize * sizeof(char));
     zBuffer = malloc(screenSize * sizeof(float));
 
+    // start timer
+    clock_t startClock = clock();
+
     /* Main loop */
     while (1)
     {
@@ -336,7 +339,12 @@ int main(int argc, char** argv) {
         }
 
         /* Delay */
-        sleepMilliseconds(FRAME_DELAY_MILLISECONDS);
+        clock_t endClock = clock();
+        while (endClock - startClock < FRAME_DELAY_MILLISECONDS * CLOCKS_PER_SEC / 1000)
+        {
+            endClock = clock();
+        }
+        startClock = endClock;
     }
 
     free(buffer);
