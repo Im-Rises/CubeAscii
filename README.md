@@ -3,6 +3,11 @@
 This is a C project to print a 3D rotating cube in the terminal using ASCII characters with each face having a different
 color.
 
+It uses ANSI escape codes to move the cursor and change the color of the text.
+I used my header only library for this project, you can find
+it at [cUnicodeLib](https://github.com/Im-Rises/cUnicodeLib/tree/main/cUnicodeLib) this library is used to print the
+unicode characters and to change the color of the text (foreground and background).
+
 > **Note**  
 > This project is based on the work from `Servet Gulnaroglu` [here](https://www.youtube.com/watch?v=p09i_hoFdd0)
 
