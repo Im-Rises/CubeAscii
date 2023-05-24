@@ -7,8 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef __unix__
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
+#include <signal.h>
 #endif
 
 #include <stdlib.h>
@@ -19,7 +22,7 @@
 #define PROJECT_AUTHOR "Quentin MOREL (Im-Rises)"
 #define PROJECT_NAME "CubeAscii"
 #define PROJECT_REPOSITORY "https://github.com/Im-Rises/CubeAscii/"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 #define OPTION_CUBE_COUNT "-c"
 #define OPTION_CUBE_GRAY_MODE "-g"
@@ -91,6 +94,26 @@ void printToConsole(Screen* screen);
 void printToConsoleColored(Screen* screen);
 void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePtr)(Screen*));
 
+/* Exit handlers*/
+int exitMainLoopFlag = 0;
+#ifdef _WIN32
+BOOL CtrlHandler(DWORD ctrlType) {
+    if (ctrlType == CTRL_C_EVENT)
+    {
+        exitMainLoopFlag = 1;
+        return TRUE;
+    }
+    return FALSE;
+}
+#else
+void signalHandler(int signum) {
+    if (signum == SIGINT)
+    {
+        exitMainLoopFlag = 1;
+    }
+}
+#endif
+
 /* Main */
 int main(int argc, char** argv) {
     /* Initialize the random number generator */
@@ -120,9 +143,15 @@ int main(int argc, char** argv) {
     /* Main loop */
     mainLoop(&screen, cubeArray, cubeCount, printCubePtr);
 
+    /* Stop message */
+    printf("\nExiting...\n");
+
     /* Free memory */
     free(screen.buffer);
     free(screen.zBuffer);
+
+    /* Reset default foreground */
+    printf(ESC_RESET_FG);
 
     return 0;
 }
@@ -397,6 +426,17 @@ void printToConsoleColored(Screen* screen) {
 }
 
 void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePtr)(Screen*)) {
+    /* Set signal handler */
+#ifdef _WIN32
+    if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE))
+    {
+        fprintf(stderr, "Error setting up Ctrl+C signal handler.\n");
+        exit(1);
+    }
+#else
+    signal(SIGINT, signalHandler);
+#endif
+
     /* Clear screen */
     printf(ESC_CLEAR_SCREEN);
 
@@ -404,7 +444,7 @@ void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePt
     clock_t startClock = clock();
 
     /* Main loop */
-    while (1)
+    while (!exitMainLoopFlag)
     {
         /* Refresh buffers */
         clearScreenBuffers(screen);
