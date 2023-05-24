@@ -7,9 +7,7 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef _WIN32
-#include <windows.h>
-#else
+#ifdef __unix__
 #include <unistd.h>
 #endif
 
@@ -17,6 +15,11 @@
 #include <time.h>
 
 #include "cUnicodeLib.h"
+
+#define PROJECT_AUTHOR "Quentin MOREL (Im-Rises)"
+#define PROJECT_NAME "CubeAscii"
+#define PROJECT_REPOSITORY "https://github.com/Im-Rises/CubeAscii/"
+#define VERSION "1.0.0"
 
 #define OPTION_CUBE_COUNT "-c"
 #define OPTION_CUBE_GRAY_MODE "-g"
@@ -125,7 +128,10 @@ int main(int argc, char** argv) {
 }
 
 void printUsage(const char* programName) {
-    printf("Usage: %s [OPTIONS]\n"
+    printf("" PROJECT_NAME " " VERSION "\n"
+           "by " PROJECT_AUTHOR "\n"
+           "Repository: " PROJECT_REPOSITORY "\n"
+           "Usage: %s [OPTIONS]\n"
            "Options:\n"
            "  %s <count>    Number of cubes to render (default: 1) from 1 to %d\n"
            "  %s            Render in gray mode\n"
