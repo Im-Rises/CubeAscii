@@ -128,8 +128,7 @@ int main(int argc, char** argv) {
 }
 
 void printUsage(const char* programName) {
-    printf("" PROJECT_NAME " " VERSION "\n"
-           "by " PROJECT_AUTHOR "\n"
+    printf("" PROJECT_NAME " v" VERSION " by " PROJECT_AUTHOR "\n"
            "Repository: " PROJECT_REPOSITORY "\n"
            "Usage: %s [OPTIONS]\n"
            "Options:\n"
