@@ -7,8 +7,11 @@
 #include <stdio.h>
 #include <string.h>
 
-#ifdef __unix__
+#ifdef _WIN32
+#include <windows.h>
+#else
 #include <unistd.h>
+#include <signal.h>
 #endif
 
 #include <stdlib.h>
@@ -90,6 +93,26 @@ void updateBuffers(Screen* screen, Cube* cube);
 void printToConsole(Screen* screen);
 void printToConsoleColored(Screen* screen);
 void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePtr)(Screen*));
+
+/* Exit handlers*/
+int exitMainLoopFlag = 0;
+#ifdef _WIN32
+BOOL CtrlHandler(DWORD ctrlType) {
+    if (ctrlType == CTRL_C_EVENT)
+    {
+        exitMainLoopFlag = 1;
+        return TRUE;
+    }
+    return FALSE;
+}
+#else
+void signalHandler(int signum) {
+    if (signum == SIGINT)
+    {
+        exitMainLoopFlag = 1;
+    }
+}
+#endif
 
 /* Main */
 int main(int argc, char** argv) {
@@ -402,23 +425,15 @@ void printToConsoleColored(Screen* screen) {
     }
 }
 
-#ifdef _WIN32
-#include <conio.h>
-#else
-#include <signal.h>
-int flag = 0;
-void signalHandler(int signum) {
-    if (signum == SIGINT)
-    {
-        // Set the flag to exit the loop
-        flag = 1;
-    }
-}
-#endif
-
 void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePtr)(Screen*)) {
-    /* Set signal handler (Unix) */
-#ifdef __unix__
+    /* Set signal handler */
+#ifdef _WIN32
+    if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE))
+    {
+        fprintf(stderr, "Error setting up Ctrl+C signal handler.\n");
+        exit(1);
+    }
+#else
     signal(SIGINT, signalHandler);
 #endif
 
@@ -429,19 +444,8 @@ void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePt
     clock_t startClock = clock();
 
     /* Main loop */
-#ifdef _WIN32
-    while (1)
+    while (!exitMainLoopFlag)
     {
-        /* Handle use inputs*/
-        if (_kbhit())
-        {
-            break;
-        }
-#else
-    while (!flag)
-    {
-#endif
-
         /* Refresh buffers */
         clearScreenBuffers(screen);
 
