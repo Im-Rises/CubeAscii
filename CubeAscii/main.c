@@ -19,7 +19,7 @@
 #define PROJECT_AUTHOR "Quentin MOREL (Im-Rises)"
 #define PROJECT_NAME "CubeAscii"
 #define PROJECT_REPOSITORY "https://github.com/Im-Rises/CubeAscii/"
-#define VERSION "1.0.0"
+#define VERSION "1.1.0"
 
 #define OPTION_CUBE_COUNT "-c"
 #define OPTION_CUBE_GRAY_MODE "-g"
@@ -120,9 +120,15 @@ int main(int argc, char** argv) {
     /* Main loop */
     mainLoop(&screen, cubeArray, cubeCount, printCubePtr);
 
+    /* Stop message */
+    printf("\nExiting...\n");
+
     /* Free memory */
     free(screen.buffer);
     free(screen.zBuffer);
+
+    /* Reset default foreground */
+    printf(ESC_RESET_FG);
 
     return 0;
 }
@@ -396,7 +402,26 @@ void printToConsoleColored(Screen* screen) {
     }
 }
 
+#ifdef _WIN32
+#include <conio.h>
+#else
+#include <signal.h>
+int flag = 0;
+void signalHandler(int signum) {
+    if (signum == SIGINT)
+    {
+        // Set the flag to exit the loop
+        flag = 1;
+    }
+}
+#endif
+
 void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePtr)(Screen*)) {
+    /* Set signal handler (Unix) */
+#ifdef __unix__
+    signal(SIGINT, signalHandler);
+#endif
+
     /* Clear screen */
     printf(ESC_CLEAR_SCREEN);
 
@@ -404,8 +429,19 @@ void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePt
     clock_t startClock = clock();
 
     /* Main loop */
+#ifdef _WIN32
     while (1)
     {
+        /* Handle use inputs*/
+        if (_kbhit())
+        {
+            break;
+        }
+#else
+    while (!flag)
+    {
+#endif
+
         /* Refresh buffers */
         clearScreenBuffers(screen);
 
