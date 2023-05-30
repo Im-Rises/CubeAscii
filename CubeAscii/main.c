@@ -469,7 +469,7 @@ void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePt
 
         /* Delay */
         clock_t endClock = clock();
-        double deltaTime = (double)((endClock - startClock) / CLOCKS_PER_SEC) * 1000.0;
+        float deltaTime = (((float)(endClock - startClock)) / CLOCKS_PER_SEC) * 1000.0F;
         if (deltaTime < FRAME_DELAY_MILLISECONDS)
         {
             sleepMilliseconds((int)(FRAME_DELAY_MILLISECONDS - deltaTime));
