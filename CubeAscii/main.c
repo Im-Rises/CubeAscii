@@ -27,6 +27,8 @@
 
 #define OPTION_CUBE_COUNT "-c"
 #define OPTION_CUBE_GRAY_MODE "-g"
+#define OPTION_CUBE_MAX_ROTATION_SPEED "-m"
+#define OPTION_CUBE_MIN_ROTATION_SPEED "-n"
 #define OPTION_HELP "-h"
 
 #define FRAME_DELAY_MILLISECONDS 16
@@ -67,12 +69,12 @@ struct Cube {
 
 /* App usage and arguments handling */
 void printUsage(const char* programName);
-void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr)(Screen*));
+void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr)(Screen*), float* minRotationSpeed, float* maxRotationSpeed);
+void checkArgumentsValidity(int cubeCount, float minRotationSpeed, float maxRotationSpeed);
 void printUnknownArgumentError(const char* argument);
 
 /* Random */
 float randomFloat(float min, float max);
-float randomRotationValue();
 
 /* Sleep */
 void sleepMilliseconds(int milliseconds);
@@ -80,7 +82,7 @@ void sleepMilliseconds(int milliseconds);
 /* Cube and screen initialization */
 Cube createCube();
 Cube createCustomCube(float rotationX, float rotationY, float rotationZ, float rotationXSpeed, float rotationYSpeed, float rotationZSpeed, float cubeWidthHeight, float horizontalOffset, float verticalOffset, int distanceFromCam);
-void initCubesAndScreen(Screen* screen, Cube* cubeArray, int cubeCount);
+void initCubesAndScreen(Screen* screen, Cube* cubeArray, int cubeCount, float minRotationSpeed, float maxRotationSpeed);
 
 /* Cube rotation and calculations */
 float calculateX(float i, float j, float k, Cube* cube);
@@ -124,9 +126,14 @@ int main(int argc, char** argv) {
     /* Argument variables */
     void (*printCubePtr)(Screen*) = printToConsoleColored;
     int cubeCount = 1;
+    float maxRotationSpeed = MAX_ROTATION_SPEED;
+    float minxRotationSpeed = MIN_ROTATION_SPEED;
 
     /* Handle arguments */
-    handleArguments(argc, argv, &cubeCount, &printCubePtr);
+    handleArguments(argc, argv, &cubeCount, &printCubePtr, &minxRotationSpeed, &maxRotationSpeed);
+
+    /* Check arguments values*/
+    checkArgumentsValidity(cubeCount, minxRotationSpeed, maxRotationSpeed);
 
     /* Initialize unicode library */
     if (initUnicodeLib() != 0)
@@ -140,7 +147,7 @@ int main(int argc, char** argv) {
     Screen screen;
 
     /* Init cubes and screen */
-    initCubesAndScreen(&screen, cubeArray, cubeCount);
+    initCubesAndScreen(&screen, cubeArray, cubeCount, minxRotationSpeed, maxRotationSpeed);
 
     /* Main loop */
     mainLoop(&screen, cubeArray, cubeCount, printCubePtr);
@@ -173,7 +180,7 @@ void printUsage(const char* programName) {
         OPTION_HELP);
 }
 
-void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr)(Screen*)) {
+void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr)(Screen*), float* minRotationSpeed, float* maxRotationSpeed) {
     for (int i = 1; i < argc; i++)
     {
         if (strcmp(argv[i], OPTION_CUBE_COUNT) == 0)
@@ -181,16 +188,7 @@ void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr
             if (i + 1 < argc)
             {
                 int count = atoi(argv[i + 1]);
-                if (count >= 1 && count <= MAX_CUBE_COUNT)
-                {
-                    *cubeCount = count;
-                    i++;
-                }
-                else
-                {
-                    fprintf(stderr, "Invalid cube count: %s (must be between 1 and %d)\n", argv[i + 1], MAX_CUBE_COUNT);
-                    exit(1);
-                }
+                *cubeCount = count;
             }
             else
             {
@@ -201,6 +199,32 @@ void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr
         else if (strcmp(argv[i], OPTION_CUBE_GRAY_MODE) == 0)
         {
             *printCubePtr = printToConsole;
+        }
+        else if (strcmp(argv[i], OPTION_CUBE_MAX_ROTATION_SPEED) == 0)
+        {
+            if (i + 1 < argc)
+            {
+                float speed = atof(argv[i + 1]);
+                *maxRotationSpeed = speed;
+            }
+            else
+            {
+                fprintf(stderr, "Missing max rotation speed\n");
+                exit(1);
+            }
+        }
+        else if (strcmp(argv[i], OPTION_CUBE_MIN_ROTATION_SPEED) == 0)
+        {
+            if (i + 1 < argc)
+            {
+                float speed = atof(argv[i + 1]);
+                *minRotationSpeed = speed;
+            }
+            else
+            {
+                fprintf(stderr, "Missing min rotation speed\n");
+                exit(1);
+            }
         }
         else if (strcmp(argv[i], OPTION_HELP) == 0)
         {
@@ -215,6 +239,29 @@ void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr
     }
 }
 
+void checkArgumentsValidity(int cubeCount, float minRotationSpeed, float maxRotationSpeed) {
+    if (cubeCount < 1 || cubeCount > MAX_CUBE_COUNT)
+    {
+        fprintf(stderr, "Invalid cube count: %d (must be between 1 and %d)\n", cubeCount, MAX_CUBE_COUNT);
+        exit(1);
+    }
+    if (minRotationSpeed < MIN_ROTATION_SPEED || minRotationSpeed > MAX_ROTATION_SPEED)
+    {
+        fprintf(stderr, "Invalid min rotation speed: %f (must be between %f and %f)\n", minRotationSpeed, MIN_ROTATION_SPEED, MAX_ROTATION_SPEED);
+        exit(1);
+    }
+    if (maxRotationSpeed < MIN_ROTATION_SPEED || maxRotationSpeed > MAX_ROTATION_SPEED)
+    {
+        fprintf(stderr, "Invalid max rotation speed: %f (must be between %f and %f)\n", maxRotationSpeed, MIN_ROTATION_SPEED, MAX_ROTATION_SPEED);
+        exit(1);
+    }
+    if (minRotationSpeed > maxRotationSpeed)
+    {
+        fprintf(stderr, "Invalid min/max rotation speed: %f/%f (min must be less than max)\n", minRotationSpeed, maxRotationSpeed);
+        exit(1);
+    }
+}
+
 void printUnknownArgumentError(const char* argument) {
     fprintf(stderr, "Unknown argument: %s\n", argument);
 }
@@ -222,10 +269,6 @@ void printUnknownArgumentError(const char* argument) {
 float randomFloat(float min, float max) {
     float scale = (float)rand() / (float)RAND_MAX;
     return min + scale * (max - min);
-}
-
-float randomRotationValue() {
-    return randomFloat(MIN_ROTATION_SPEED, MAX_ROTATION_SPEED);
 }
 
 void sleepMilliseconds(int milliseconds) {
@@ -275,11 +318,11 @@ Cube createCustomCube(float rotationX, float rotationY, float rotationZ, float r
     return cube;
 }
 
-void initCubesAndScreen(Screen* screen, Cube* cubeArray, int cubeCount) {
+void initCubesAndScreen(Screen* screen, Cube* cubeArray, int cubeCount, float minRotationSpeed, float maxRotationSpeed) {
     cubeArray[0] = createCube();
-    cubeArray[0].rotationXSpeed = randomRotationValue();
-    cubeArray[0].rotationYSpeed = randomRotationValue();
-    cubeArray[0].rotationZSpeed = randomRotationValue();
+    cubeArray[0].rotationXSpeed = randomFloat(minRotationSpeed, maxRotationSpeed);
+    cubeArray[0].rotationYSpeed = randomFloat(minRotationSpeed, maxRotationSpeed);
+    cubeArray[0].rotationZSpeed = randomFloat(minRotationSpeed, maxRotationSpeed);
 
     /* Initialize screen and cubes */
     if (cubeCount == 1)
@@ -292,15 +335,15 @@ void initCubesAndScreen(Screen* screen, Cube* cubeArray, int cubeCount) {
         screen->width = 100;
         screen->height = 30;
         cubeArray[0].horizontalOffset = 15;
-        cubeArray[1] = createCustomCube(0, 0, 0, randomRotationValue(), randomRotationValue(), randomRotationValue(), 20, -30, 0, 100);
+        cubeArray[1] = createCustomCube(0, 0, 0, randomFloat(minRotationSpeed, maxRotationSpeed), randomFloat(minRotationSpeed, maxRotationSpeed), randomFloat(minRotationSpeed, maxRotationSpeed), 20, -30, 0, 100);
     }
     else if (cubeCount == 3)
     {
         screen->width = 120;
         screen->height = 30;
         cubeArray[0].horizontalOffset = 5;
-        cubeArray[1] = createCustomCube(0, 0, 0, randomRotationValue(), randomRotationValue(), randomRotationValue(), 20, -42, 0, 100);
-        cubeArray[2] = createCustomCube(0, 0, 0, randomRotationValue(), randomRotationValue(), randomRotationValue(), 10, +45, 0, 100);
+        cubeArray[1] = createCustomCube(0, 0, 0, randomFloat(minRotationSpeed, maxRotationSpeed), randomFloat(minRotationSpeed, maxRotationSpeed), randomFloat(minRotationSpeed, maxRotationSpeed), 20, -42, 0, 100);
+        cubeArray[2] = createCustomCube(0, 0, 0, randomFloat(minRotationSpeed, maxRotationSpeed), randomFloat(minRotationSpeed, maxRotationSpeed), randomFloat(minRotationSpeed, maxRotationSpeed), 10, +45, 0, 100);
     }
     else
     {
