@@ -429,14 +429,24 @@ void printToConsoleColored(Screen* screen) {
 void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePtr)(Screen*)) {
     /* Set signal handler */
 #ifdef _WIN32
+    // Set up Ctrl+C signal handler
     if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE))
     {
         fprintf(stderr, "Error setting up Ctrl+C signal handler.\n");
         exit(1);
     }
 
+    // Hide the cursor
+    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(consoleHandle, &cursorInfo);
+    cursorInfo.bVisible = FALSE;
+    SetConsoleCursorInfo(consoleHandle, &cursorInfo);
+
+    // Set the timer resolution to 1 ms
     timeBeginPeriod(1);
 #else
+    // Set up Ctrl+C signal handler
     signal(SIGINT, signalHandler);
 #endif
 
