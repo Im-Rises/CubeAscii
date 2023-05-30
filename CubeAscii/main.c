@@ -22,7 +22,7 @@
 #define PROJECT_AUTHOR "Quentin MOREL (Im-Rises)"
 #define PROJECT_NAME "CubeAscii"
 #define PROJECT_REPOSITORY "https://github.com/Im-Rises/CubeAscii/"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define OPTION_CUBE_COUNT "-c"
 #define OPTION_CUBE_GRAY_MODE "-g"
@@ -73,7 +73,8 @@ void printUnknownArgumentError(const char* argument);
 float randomFloat(float min, float max);
 float randomRotationValue();
 
-// void sleepMilliseconds(int milliseconds);
+/* Sleep */
+void sleepMilliseconds(int milliseconds);
 
 /* Cube and screen initialization */
 Cube createCube();
@@ -226,13 +227,13 @@ float randomRotationValue() {
     return randomFloat(MIN_ROTATION_SPEED, MAX_ROTATION_SPEED);
 }
 
-// void sleepMilliseconds(int milliseconds) {
-// #ifdef _WIN32
-//     Sleep(milliseconds);
-// #else
-//     usleep(milliseconds * 1000);
-// #endif
-// }
+void sleepMilliseconds(int milliseconds) {
+#ifdef _WIN32
+    Sleep(milliseconds);
+#else
+    usleep(milliseconds * 1000);
+#endif
+}
 
 Cube createCube() {
     Cube cube;
@@ -428,12 +429,24 @@ void printToConsoleColored(Screen* screen) {
 void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePtr)(Screen*)) {
     /* Set signal handler */
 #ifdef _WIN32
+    // Set up Ctrl+C signal handler
     if (!SetConsoleCtrlHandler((PHANDLER_ROUTINE)CtrlHandler, TRUE))
     {
         fprintf(stderr, "Error setting up Ctrl+C signal handler.\n");
         exit(1);
     }
+
+    // Hide the cursor
+    HANDLE consoleHandle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_CURSOR_INFO cursorInfo;
+    GetConsoleCursorInfo(consoleHandle, &cursorInfo);
+    cursorInfo.bVisible = FALSE;
+    SetConsoleCursorInfo(consoleHandle, &cursorInfo);
+
+    // Set the timer resolution to 1 ms
+    timeBeginPeriod(1);
 #else
+    // Set up Ctrl+C signal handler
     signal(SIGINT, signalHandler);
 #endif
 
@@ -466,12 +479,18 @@ void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePt
 
         /* Delay */
         clock_t endClock = clock();
-        while (endClock - startClock < FRAME_DELAY_MILLISECONDS * CLOCKS_PER_SEC / 1000)
+        float deltaTime = (((float)(endClock - startClock)) / CLOCKS_PER_SEC) * 1000.0F;
+        if (deltaTime < FRAME_DELAY_MILLISECONDS)
         {
-            endClock = clock();
+            sleepMilliseconds((int)(FRAME_DELAY_MILLISECONDS - deltaTime));
         }
+
         startClock = endClock;
     }
+
+#ifdef _WIN32
+    timeEndPeriod(1);
+#endif
 }
 
 #pragma clang diagnostic pop
