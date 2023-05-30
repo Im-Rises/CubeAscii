@@ -48,7 +48,7 @@
 #define FACE_5_CHARACTER ';'
 #define FACE_6_CHARACTER '+'
 
-#define STRINGIFY(x) #x
+// #define STRINGIFY(x) #x
 
 typedef struct Screen Screen;
 struct Screen {
@@ -174,15 +174,15 @@ void printUsage(const char* programName) {
            "Options:\n"
            "  %s <count>    Number of cubes to render (default: 1) from 1 to %d\n"
            "  %s            Render in gray mode\n"
-           "  %s <speed>    Minimum rotation speed (default: %s )\n"
-           "  %s <speed>    Maximum rotation speed (default: %s )\n"
+           "  %s <speed>    Minimum rotation speed (default: %f )\n"
+           "  %s <speed>    Maximum rotation speed (default: %f )\n"
            "  %s            Print this help message\n"
            "\n",
         programName,
         OPTION_CUBE_COUNT, MAX_CUBE_COUNT,
         OPTION_CUBE_GRAY_MODE,
-        OPTION_CUBE_MAX_ROTATION_SPEED, STRINGIFY(MIN_ROTATION_SPEED),
-        OPTION_CUBE_MIN_ROTATION_SPEED, STRINGIFY(MAX_ROTATION_SPEED),
+        OPTION_CUBE_MIN_ROTATION_SPEED, MAX_ROTATION_SPEED,
+        OPTION_CUBE_MAX_ROTATION_SPEED, MIN_ROTATION_SPEED,
         OPTION_HELP);
 }
 
@@ -210,7 +210,7 @@ void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr
         {
             if (i + 1 < argc)
             {
-                float speed = atof(argv[i + 1]);
+                float speed = (float)atof(argv[i + 1]);
                 *maxRotationSpeed = speed;
             }
             else
@@ -223,7 +223,7 @@ void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr
         {
             if (i + 1 < argc)
             {
-                float speed = atof(argv[i + 1]);
+                float speed = (float)atof(argv[i + 1]);
                 *minRotationSpeed = speed;
             }
             else
