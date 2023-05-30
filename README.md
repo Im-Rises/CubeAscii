@@ -44,8 +44,8 @@ You can use the following options:
 - `-h` : to display the usage
 - `-c <count>` : to set the number of cubes to display (default: 1) choose between 1 and 3
 - `-g` : to display in gray mode the cubes
-- `-m` : to set the max rotation speed
-- `-n` : to set the min rotation speed
+- `-m` <value> : to set the max rotation speed
+- `-n` <value> : to set the min rotation speed
 
 You can combine the commands to set the number of cubes and to display in gray mode at the same time:
 
