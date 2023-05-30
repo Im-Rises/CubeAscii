@@ -189,12 +189,13 @@ void printUsage(const char* programName) {
 void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr)(Screen*), float* minRotationSpeed, float* maxRotationSpeed) {
     for (int i = 1; i < argc; i++)
     {
+        printf("Argument %d: %s\n", i, argv[i]);
         if (strcmp(argv[i], OPTION_CUBE_COUNT) == 0)
         {
             if (i + 1 < argc)
             {
-                int count = atoi(argv[i + 1]);
-                *cubeCount = count;
+                *cubeCount = atoi(argv[i + 1]);
+                i++;
             }
             else
             {
@@ -210,8 +211,8 @@ void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr
         {
             if (i + 1 < argc)
             {
-                float speed = (float)atof(argv[i + 1]);
-                *maxRotationSpeed = speed;
+                *maxRotationSpeed = (float)atof(argv[i + 1]);
+                i++;
             }
             else
             {
@@ -223,8 +224,8 @@ void handleArguments(int argc, char** argv, int* cubeCount, void (**printCubePtr
         {
             if (i + 1 < argc)
             {
-                float speed = (float)atof(argv[i + 1]);
-                *minRotationSpeed = speed;
+                *minRotationSpeed = (float)atof(argv[i + 1]);
+                i++;
             }
             else
             {
