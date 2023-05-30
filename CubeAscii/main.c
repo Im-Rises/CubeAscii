@@ -22,7 +22,7 @@
 #define PROJECT_AUTHOR "Quentin MOREL (Im-Rises)"
 #define PROJECT_NAME "CubeAscii"
 #define PROJECT_REPOSITORY "https://github.com/Im-Rises/CubeAscii/"
-#define VERSION "1.1.0"
+#define VERSION "1.2.0"
 
 #define OPTION_CUBE_COUNT "-c"
 #define OPTION_CUBE_GRAY_MODE "-g"
