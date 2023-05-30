@@ -48,6 +48,8 @@
 #define FACE_5_CHARACTER ';'
 #define FACE_6_CHARACTER '+'
 
+#define STRINGIFY(x) #x
+
 typedef struct Screen Screen;
 struct Screen {
     int width, height;
@@ -172,11 +174,14 @@ void printUsage(const char* programName) {
            "Options:\n"
            "  %s <count>    Number of cubes to render (default: 1) from 1 to %d\n"
            "  %s            Render in gray mode\n"
-           "  %s            Print this help message\n"
-           "\n",
+           "  %s <speed>    Minimum rotation speed (default: " STRINGIFY(MIN_ROTATION_SPEED) ")\n"
+                                                                                             "  %s <speed>    Maximum rotation speed (default: " STRINGIFY(MAX_ROTATION_SPEED) ")\n"
+                                                                                                                                                                               "  %s            Print this help message\n"
+                                                                                                                                                                               "\n",
         programName,
         OPTION_CUBE_COUNT, MAX_CUBE_COUNT,
         OPTION_CUBE_GRAY_MODE,
+        OPTION_CUBE_MAX_ROTATION_SPEED, OPTION_CUBE_MIN_ROTATION_SPEED,
         OPTION_HELP);
 }
 
