@@ -12,6 +12,7 @@
 #else
 #include <unistd.h>
 #include <signal.h>
+#include <sched.h>
 #endif
 
 #include <stdlib.h>
@@ -22,7 +23,7 @@
 #define PROJECT_AUTHOR "Quentin MOREL (Im-Rises)"
 #define PROJECT_NAME "CubeAscii"
 #define PROJECT_REPOSITORY "https://github.com/Im-Rises/CubeAscii/"
-#define VERSION "1.2.0"
+#define VERSION "1.2.1"
 
 #define OPTION_CUBE_COUNT "-c"
 #define OPTION_CUBE_GRAY_MODE "-g"
@@ -231,7 +232,16 @@ void sleepMilliseconds(int milliseconds) {
 #ifdef _WIN32
     Sleep(milliseconds);
 #else
-    usleep(milliseconds * 1000);
+    //    usleep(milliseconds * 1000);
+    struct timespec ts;
+    ts.tv_sec = milliseconds / 1000;
+    ts.tv_nsec = (milliseconds % 1000) * 1000000;
+
+    while (nanosleep(&ts, &ts) == -1)
+    {
+        // nanosleep was interrupted, continue sleeping
+        continue;
+    }
 #endif
 }
 
