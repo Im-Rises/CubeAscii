@@ -6,4 +6,10 @@ set(CMAKE_C_EXTENSIONS OFF)
 
 project(CubeAscii)
 
+cmake_policy(SET CMP0079 NEW)
+
 add_subdirectory(${PROJECT_NAME})
+
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} PRIVATE winmm.lib)
+endif ()

@@ -73,7 +73,8 @@ void printUnknownArgumentError(const char* argument);
 float randomFloat(float min, float max);
 float randomRotationValue();
 
-// void sleepMilliseconds(int milliseconds);
+/* Sleep */
+void sleepMilliseconds(int milliseconds);
 
 /* Cube and screen initialization */
 Cube createCube();
@@ -226,13 +227,13 @@ float randomRotationValue() {
     return randomFloat(MIN_ROTATION_SPEED, MAX_ROTATION_SPEED);
 }
 
-// void sleepMilliseconds(int milliseconds) {
-// #ifdef _WIN32
-//     Sleep(milliseconds);
-// #else
-//     usleep(milliseconds * 1000);
-// #endif
-// }
+void sleepMilliseconds(int milliseconds) {
+#ifdef _WIN32
+    Sleep(milliseconds);
+#else
+    usleep(milliseconds * 1000);
+#endif
+}
 
 Cube createCube() {
     Cube cube;
@@ -433,6 +434,8 @@ void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePt
         fprintf(stderr, "Error setting up Ctrl+C signal handler.\n");
         exit(1);
     }
+
+    timeBeginPeriod(1);
 #else
     signal(SIGINT, signalHandler);
 #endif
@@ -466,12 +469,18 @@ void mainLoop(Screen* screen, Cube* cubeArray, int cubeCount, void (*printCubePt
 
         /* Delay */
         clock_t endClock = clock();
-        while (endClock - startClock < FRAME_DELAY_MILLISECONDS * CLOCKS_PER_SEC / 1000)
+        double deltaTime = (double)((endClock - startClock) / CLOCKS_PER_SEC) * 1000.0;
+        if (deltaTime < FRAME_DELAY_MILLISECONDS)
         {
-            endClock = clock();
+            sleepMilliseconds((int)(FRAME_DELAY_MILLISECONDS - deltaTime));
         }
+
         startClock = endClock;
     }
+
+#ifdef _WIN32
+    timeEndPeriod(1);
+#endif
 }
 
 #pragma clang diagnostic pop
