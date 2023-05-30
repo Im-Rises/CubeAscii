@@ -23,7 +23,7 @@
 #define PROJECT_AUTHOR "Quentin MOREL (Im-Rises)"
 #define PROJECT_NAME "CubeAscii"
 #define PROJECT_REPOSITORY "https://github.com/Im-Rises/CubeAscii/"
-#define VERSION "1.2.1"
+#define VERSION "1.4.0"
 
 #define OPTION_CUBE_COUNT "-c"
 #define OPTION_CUBE_GRAY_MODE "-g"
@@ -252,14 +252,14 @@ void checkArgumentsValidity(int cubeCount, float minRotationSpeed, float maxRota
         fprintf(stderr, "Invalid cube count: %d (must be between 1 and %d)\n", cubeCount, MAX_CUBE_COUNT);
         exit(1);
     }
-    if (minRotationSpeed < MIN_ROTATION_SPEED || minRotationSpeed > MAX_ROTATION_SPEED)
+    if (minRotationSpeed > maxRotationSpeed)
     {
-        fprintf(stderr, "Invalid min rotation speed: %f (must be between %f and %f)\n", minRotationSpeed, MIN_ROTATION_SPEED, MAX_ROTATION_SPEED);
+        fprintf(stderr, "Invalid min rotation speed: %f (must be less than the max rotation speed %f)\n", minRotationSpeed, maxRotationSpeed);
         exit(1);
     }
-    if (maxRotationSpeed < MIN_ROTATION_SPEED || maxRotationSpeed > MAX_ROTATION_SPEED)
+    if (maxRotationSpeed < MIN_ROTATION_SPEED)
     {
-        fprintf(stderr, "Invalid max rotation speed: %f (must be between %f and %f)\n", maxRotationSpeed, MIN_ROTATION_SPEED, MAX_ROTATION_SPEED);
+        fprintf(stderr, "Invalid max rotation speed: %f (must be greater than the min rotation speed %f)\n", maxRotationSpeed, MIN_ROTATION_SPEED);
         exit(1);
     }
     if (minRotationSpeed > maxRotationSpeed)
